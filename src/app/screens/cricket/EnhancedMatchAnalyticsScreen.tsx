@@ -35,7 +35,8 @@ import {
   PartnershipBreakdown,
   BowlingSpellAnalysis,
   MatchMomentum,
-  MicroMatchMomentum
+  MicroMatchMomentum,
+  BallByBallMomentumBreakdown
 } from '../../components/cricket';
 
 interface EnhancedMatchAnalyticsScreenProps {
@@ -120,372 +121,419 @@ export const EnhancedMatchAnalyticsScreen: React.FC<EnhancedMatchAnalyticsScreen
   const topBowlers = viewModel.getTopBowlers(6);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-850 to-gray-900">
-      {/* Subtle Background Elements */}
-      <div className="absolute inset-0 overflow-hidden opacity-30">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Enhanced Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-emerald-500/5 via-blue-500/5 to-purple-500/5"></div>
+        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-2/3 left-2/3 w-60 h-60 bg-purple-500/10 rounded-full blur-2xl animate-pulse delay-2000"></div>
       </div>
 
-      {/* Main Content Container */}
-      <div className="relative z-10 container mx-auto px-3 py-4 space-y-3">
-        {/* Compact Navigation */}
-        <div className="flex items-center justify-between py-2 px-3 bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-xl">
-          <button 
-            onClick={() => window.history.back()} 
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-lg transition-all duration-200"
-          >
-            <span className="text-sm">←</span>
-            <span className="text-xs font-medium">Back</span>
-          </button>
-          
-          <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-1.5 bg-green-500/20 px-2.5 py-1 rounded-lg">
-              <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-green-300 text-xs font-medium">Live</span>
-            </div>
-            <span className="text-gray-400 text-xs font-mono">{matchId}</span>
-          </div>
-        </div>
-
-        {/* Compact Match Header */}
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-xl overflow-hidden">
-          <div className="p-3">
-            {/* Teams Header */}
-            <div className="text-center mb-3">
-              <h1 className="text-xl font-bold text-white mb-0.5">
-                {matchData.info.teams.join(' vs ')}
-              </h1>
-              <div className="text-gray-400 text-xs">
-                {matchData.info.event && (
-                  typeof matchData.info.event === 'string' 
-                    ? matchData.info.event 
-                    : matchData.info.event.name
-                )}
+      {/* Email-style Layout Container */}
+      <div className="relative z-10 h-screen flex flex-col">
+        {/* Top Header Bar */}
+        <div className="flex-shrink-0 relative overflow-hidden border-b border-slate-700/50 bg-gradient-to-r from-slate-800/95 via-slate-700/95 to-slate-800/95 backdrop-blur-xl">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-blue-500/5 to-purple-500/5"></div>
+          <div className="relative flex items-center justify-between p-4">
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => window.history.back()} 
+                className="group flex items-center gap-2 px-3 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 hover:text-white rounded-lg transition-all duration-300 border border-slate-600/30 hover:border-slate-500/50"
+              >
+                <span className="text-sm group-hover:scale-110 transition-transform">←</span>
+                <span className="text-sm font-medium">Back</span>
+              </button>
+              
+              <div className="hidden md:flex items-center gap-3">
+                <div className="flex items-center gap-2 bg-emerald-500/20 px-3 py-1.5 rounded-lg border border-emerald-500/30">
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                  <span className="text-emerald-300 text-xs font-medium">Live Analysis</span>
+                </div>
+                <div className="text-slate-400 text-xs">
+                  Match ID: <span className="font-mono text-slate-300">{matchId}</span>
+                </div>
               </div>
             </div>
             
-            {/* Match Result */}
-            <div className="text-center mb-3">
-              <div className="inline-flex items-center gap-1.5 bg-blue-500/20 border border-blue-500/30 rounded-lg px-3 py-1.5">
-                <span className="text-sm">🏆</span>
-                <div className="text-white font-medium text-xs">
-                  {(() => {
-                    const outcome = matchData.info.outcome;
-                    if (outcome?.winner) {
-                      let resultText = `${outcome.winner} won`;
-                      if (outcome.by?.runs) {
-                        resultText += ` by ${outcome.by.runs} runs`;
-                      } else if (outcome.by?.wickets) {
-                        resultText += ` by ${outcome.by.wickets} wickets`;
+            <div className="flex items-center gap-2 text-slate-300">
+              <span className="text-xl">🏏</span>
+              <span className="hidden sm:block text-sm font-semibold">CricInfo Analytics</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Email-style Main Layout */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Left Sidebar - Navigation Menu */}
+          <div className="w-80 bg-gradient-to-b from-slate-800/95 to-slate-900/95 border-r border-slate-700/50 backdrop-blur-xl flex flex-col">
+            {/* Match Header in Sidebar */}
+            <div className="flex-shrink-0 p-4 border-b border-slate-700/50">
+              <div className="text-center mb-4">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                    <span className="text-sm">🏏</span>
+                  </div>
+                  <h1 className="text-lg font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
+                    {matchData.info.teams.join(' vs ')}
+                  </h1>
+                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center">
+                    <span className="text-sm">🏆</span>
+                  </div>
+                </div>
+                
+                {/* Match Result */}
+                <div className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 border border-emerald-500/30 rounded-lg px-3 py-2 mb-3">
+                  <div className="text-white font-semibold text-xs">
+                    {(() => {
+                      const outcome = matchData.info.outcome;
+                      if (outcome?.winner) {
+                        let resultText = `${outcome.winner} won`;
+                        if (outcome.by?.runs) {
+                          resultText += ` by ${outcome.by.runs} runs`;
+                        } else if (outcome.by?.wickets) {
+                          resultText += ` by ${outcome.by.wickets} wickets`;
+                        }
+                        return resultText;
                       }
-                      return resultText;
-                    }
-                    return outcome?.result || 'Match completed';
-                  })()}
-                </div>
-              </div>
-            </div>
-
-            {/* Compact Match Details */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <div className="bg-gray-700/30 rounded-lg p-2">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="text-xs">📅</span>
-                  <span className="text-gray-300 text-xs font-medium">Date</span>
-                </div>
-                <div className="text-white text-xs">
-                  {matchData.info.dates?.[0] ? new Date(matchData.info.dates[0]).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                  }) : 'TBD'}
-                </div>
-              </div>
-              
-              <div className="bg-gray-700/30 rounded-lg p-2">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="text-xs">📍</span>
-                  <span className="text-gray-300 text-xs font-medium">Venue</span>
-                </div>
-                <div className="text-white text-xs truncate">
-                  {matchData.info.venue}
-                  {matchData.info.city && `, ${matchData.info.city}`}
-                </div>
-              </div>
-              
-              <div className="bg-gray-700/30 rounded-lg p-2">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="text-xs">🏏</span>
-                  <span className="text-gray-300 text-xs font-medium">Format</span>
-                </div>
-                <div className="text-white text-xs">
-                  {matchData.info.match_type}
-                </div>
-              </div>
-            </div>
-
-            {/* Additional Info Pills */}
-            {(matchData.info.season || matchData.info.player_of_match || matchData.info.toss) && (
-              <div className="flex flex-wrap justify-center gap-1.5 mt-2">
-                {matchData.info.season && (
-                  <span className="bg-blue-500/20 px-2 py-0.5 rounded-md text-blue-300 text-xs">
-                    Season {matchData.info.season}
-                  </span>
-                )}
-                
-                {matchData.info.player_of_match && (
-                  <span className="bg-yellow-500/20 px-2 py-0.5 rounded-md text-yellow-300 text-xs">
-                    🏆 {Array.isArray(matchData.info.player_of_match) 
-                      ? matchData.info.player_of_match[0] 
-                      : matchData.info.player_of_match}
-                  </span>
-                )}
-                
-                {matchData.info.toss && (
-                  <span className="bg-purple-500/20 px-2 py-0.5 rounded-md text-purple-300 text-xs">
-                    Toss: {matchData.info.toss.winner}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Compact Score Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          {matchData.innings?.map((innings, index) => {
-            // Calculate innings stats inline
-            let totalRuns = 0;
-            let totalWickets = 0;
-            let totalBalls = 0;
-            let boundaries = 0;
-            let sixes = 0;
-
-            innings.overs.forEach(over => {
-              over.deliveries.forEach(delivery => {
-                totalRuns += delivery.runs.total;
-                totalBalls++;
-                
-                if (delivery.runs.batter === 4) boundaries++;
-                if (delivery.runs.batter === 6) sixes++;
-                
-                if (delivery.wickets) {
-                  totalWickets += delivery.wickets.length;
-                }
-              });
-            });
-
-            const overs = Math.floor(totalBalls / 6);
-            const balls = totalBalls % 6;
-            const runRate = totalBalls > 0 ? (totalRuns * 6) / totalBalls : 0;
-
-            return (
-              <div key={index} className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-xl overflow-hidden group hover:border-gray-600/50 transition-all duration-300">
-                {/* Compact Team Header */}
-                <div className={`p-3 bg-gradient-to-r ${index === 0 ? 'from-blue-600/20 to-blue-700/20' : 'from-green-600/20 to-green-700/20'}`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-base font-semibold text-white">{innings.team}</h3>
-                      <span className="text-gray-300 text-xs">Innings {index + 1}</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xl font-bold text-white">
-                        {totalRuns}/{totalWickets}
-                      </div>
-                      <div className="text-gray-300 text-xs">
-                        ({overs}.{balls} ov)
-                      </div>
-                    </div>
+                      return outcome?.result || 'Match completed';
+                    })()}
                   </div>
                 </div>
-                
-                {/* Compact Stats */}
-                <div className="p-3">
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="text-center">
-                      <div className="text-base font-bold text-blue-300">{runRate.toFixed(1)}</div>
-                      <div className="text-gray-400 text-xs">Rate</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-base font-bold text-green-300">{boundaries}</div>
-                      <div className="text-gray-400 text-xs">4s</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-base font-bold text-purple-300">{sixes}</div>
-                      <div className="text-gray-400 text-xs">6s</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-base font-bold text-red-300">{totalWickets}</div>
-                      <div className="text-gray-400 text-xs">Wkts</div>
-                    </div>
-                  </div>
+
+                {/* Quick Info Pills */}
+                <div className="flex flex-wrap justify-center gap-1">
+                  <span className="bg-slate-700/50 px-2 py-1 rounded text-slate-300 text-xs">
+                    {matchData.info.dates?.[0] ? new Date(matchData.info.dates[0]).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric'
+                    }) : 'TBD'}
+                  </span>
+                  <span className="bg-slate-700/50 px-2 py-1 rounded text-slate-300 text-xs">
+                    {matchData.info.match_type}
+                  </span>
                 </div>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Team Comparison */}
-        {matchSummary.teamStats.length >= 2 && (
-          <StatsComparison teamStats={matchSummary.teamStats} />
-        )}
-
-        {/* Compact Tab Navigation */}
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-xl p-0.5">
-          <div className="flex flex-wrap gap-0.5">
-            {[
-              { id: 'overview', label: 'Overview', icon: '📊' },
-              { id: 'players', label: 'Players', icon: '👥' },
-              { id: 'batting', label: 'Batting', icon: '🏏' },
-              { id: 'bowling', label: 'Bowling', icon: '⚾' },
-              { id: 'overs', label: 'Overs', icon: '📈' },
-              { id: 'analysis', label: 'Deep Analysis', icon: '🔍' },
-              { id: 'commentary', label: 'Commentary', icon: '🎙️' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as TabType)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-blue-500 text-white shadow-lg'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                }`}
-              >
-                <span>{tab.icon}</span>
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Compact Tab Content */}
-        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/50 rounded-xl p-3">
-          {activeTab === 'players' && (
-            <PlayersStatsGrid match={matchData} viewModel={viewModel} />
-          )}
-
-          {activeTab === 'overview' && (
-            <OverviewTabContent 
-              matchData={matchData}
-              matchSummary={matchSummary}
-              topBatsmen={topBatsmen}
-              topBowlers={topBowlers}
-              generateManhattanData={generateManhattanData}
-            />
-          )}
-
-          {activeTab === 'batting' && (
-            <BattingTabContent topBatsmen={topBatsmen} />
-          )}
-
-          {activeTab === 'bowling' && (
-            <BowlingTabContent topBowlers={topBowlers} />
-          )}
-
-          {activeTab === 'analysis' && (
-            <div className="space-y-4">
-              {/* Cricket Insights */}
-              <CricketInsights match={matchData} viewModel={viewModel} />
-              
-              {/* Micro Match Momentum Model */}
-              <MicroMatchMomentum match={matchData} />
-              
-              {/* PowerPlay Analysis */}
-              <PowerPlayAnalysis match={matchData} />
-              
-              {/* Partnership Breakdown */}
-              <PartnershipBreakdown match={matchData} />
-              
-              {/* Bowling Spell Analysis */}
-              <BowlingSpellAnalysis match={matchData} />
-              
-              {/* Match Momentum */}
-              <MatchMomentum match={matchData} />
             </div>
-          )}
 
-          {activeTab === 'overs' && (
-            <>
-              {/* Compact Innings Selector */}
-              <div className="mb-3">
-                <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-1.5">
-                  <span>📈</span>
-                  Select Innings
-                </h3>
-                <div className="flex gap-1.5">
-                  {(matchData.innings || []).map((innings, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedInnings(index)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                        selectedInnings === index
-                          ? 'bg-orange-500 text-white'
-                          : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50 hover:text-white'
-                      }`}
-                    >
-                      {innings.team}
-                    </button>
-                  ))}
-                </div>
+            {/* Navigation Menu Items */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="space-y-1">
+                {[
+                  { id: 'overview', label: 'Match Overview', icon: '📊', description: 'Summary & highlights' },
+                  { id: 'scorecard', label: 'Live Scorecard', icon: '🏏', description: 'Current scores & status' },
+                  { id: 'players', label: 'Players Performance', icon: '👥', description: 'Individual statistics' },
+                  { id: 'batting', label: 'Batting Analysis', icon: '🏏', description: 'Top batting performances' },
+                  { id: 'bowling', label: 'Bowling Analysis', icon: '⚾', description: 'Bowling figures & economy' },
+                  { id: 'analysis', label: 'Deep Analytics', icon: '🔍', description: 'AI-powered insights' },
+                  { id: 'overs', label: 'Over by Over', icon: '📈', description: 'Ball-by-ball breakdown' },
+                  { id: 'commentary', label: 'Live Commentary', icon: '🎙️', description: 'Match commentary' }
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id as TabType)}
+                    className={`w-full text-left p-3 rounded-lg transition-all duration-200 border ${
+                      activeTab === item.id
+                        ? 'bg-gradient-to-r from-blue-500/20 to-emerald-500/20 border-blue-500/30 text-white shadow-lg'
+                        : 'bg-slate-700/30 border-slate-600/30 text-slate-300 hover:bg-slate-600/40 hover:border-slate-500/40 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className={`text-lg ${activeTab === item.id ? 'scale-110' : ''} transition-transform`}>
+                        {item.icon}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">{item.label}</div>
+                        <div className={`text-xs mt-0.5 ${activeTab === item.id ? 'text-slate-200' : 'text-slate-400'}`}>
+                          {item.description}
+                        </div>
+                      </div>
+                      {activeTab === item.id && (
+                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                      )}
+                    </div>
+                  </button>
+                ))}
               </div>
+            </div>
+          </div>
 
-              {/* Over by Over Cards */}
-              {matchData.innings?.[selectedInnings] && (
+          {/* Right Content Area */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Content Header */}
+            <div className="flex-shrink-0 bg-gradient-to-r from-slate-800/95 to-slate-700/95 border-b border-slate-700/50 p-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-semibold text-white mb-3 flex items-center gap-1.5">
-                    <span>🏏</span>
-                    {matchData.innings[selectedInnings].team} - Over by Over
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {matchData.innings[selectedInnings].overs.map((over, index) => (
-                      <OverByOverCard 
-                        key={index} 
-                        over={over} 
-                        overNumber={index + 1} 
-                      />
-                    ))}
+                  <h2 className="text-xl font-bold text-white capitalize">
+                    {activeTab === 'scorecard' ? 'Live Scorecard' : 
+                     activeTab === 'overview' ? 'Match Overview' :
+                     activeTab === 'players' ? 'Players Performance' :
+                     activeTab === 'analysis' ? 'Deep Analytics' :
+                     activeTab === 'overs' ? 'Over by Over' :
+                     activeTab === 'commentary' ? 'Live Commentary' :
+                     activeTab === 'batting' ? 'Batting Analysis' :
+                     activeTab === 'bowling' ? 'Bowling Analysis' : 
+                     'Match Details'}
+                  </h2>
+                  <p className="text-slate-400 text-sm">
+                    {activeTab === 'scorecard' ? 'Current match scores and status' :
+                     activeTab === 'overview' ? 'Match summary and key highlights' :
+                     activeTab === 'players' ? 'Individual player statistics and performance' :
+                     activeTab === 'analysis' ? 'AI-powered insights and advanced analytics' :
+                     activeTab === 'overs' ? 'Ball-by-ball breakdown of each over' :
+                     activeTab === 'commentary' ? 'Live match commentary and updates' :
+                     activeTab === 'batting' ? 'Top batting performances and statistics' :
+                     activeTab === 'bowling' ? 'Bowling figures and economy rates' : 
+                     'Detailed analysis and statistics'}
+                  </p>
+                </div>
+                
+                {/* Quick Stats in Header */}
+                <div className="hidden md:flex items-center gap-4">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-white">{matchSummary.teamStats[0]?.totalRuns || 0}</div>
+                    <div className="text-xs text-slate-400">{matchData.info.teams[0]}</div>
+                  </div>
+                  <div className="text-slate-400">vs</div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-white">{matchSummary.teamStats[1]?.totalRuns || 0}</div>
+                    <div className="text-xs text-slate-400">{matchData.info.teams[1]}</div>
                   </div>
                 </div>
-              )}
-            </>
-          )}
-
-          {activeTab === 'commentary' && (
-            <>
-              {/* Compact Innings Selector for Commentary */}
-              <div className="mb-3">
-                <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-1.5">
-                  <span>🎙️</span>
-                  Select Innings for Commentary
-                </h3>
-                <div className="flex gap-1.5">
-                  {(matchData.innings || []).map((innings, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedInnings(index)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                        selectedInnings === index
-                          ? 'bg-purple-500 text-white'
-                          : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50 hover:text-white'
-                      }`}
-                    >
-                      {innings.team}
-                    </button>
-                  ))}
-                </div>
               </div>
+            </div>
 
-              {/* Live Commentary */}
-              {matchData.innings?.[selectedInnings] && (
-                <LiveCommentary 
-                  innings={matchData.innings[selectedInnings]}
-                  title={`${matchData.innings[selectedInnings].team} Live Commentary`}
-                  maxItems={15}
-                />
-              )}
-            </>
-          )}
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-800/50 to-slate-900/50">
+              <div className="p-6">
+                
+                {/* Live Scorecard Tab */}
+                {activeTab === 'scorecard' && (
+                  <div className="space-y-6">
+                    {matchData.innings?.map((innings, index) => {
+                      // Calculate innings stats inline
+                      let totalRuns = 0;
+                      let totalWickets = 0;
+                      let totalBalls = 0;
+                      let boundaries = 0;
+                      let sixes = 0;
+
+                      innings.overs.forEach(over => {
+                        over.deliveries.forEach(delivery => {
+                          totalRuns += delivery.runs.total;
+                          totalBalls++;
+                          
+                          if (delivery.runs.batter === 4) boundaries++;
+                          if (delivery.runs.batter === 6) sixes++;
+                          
+                          if (delivery.wickets) {
+                            totalWickets += delivery.wickets.length;
+                          }
+                        });
+                      });
+
+                      const overs = Math.floor(totalBalls / 6);
+                      const balls = totalBalls % 6;
+                      const runRate = totalBalls > 0 ? (totalRuns * 6) / totalBalls : 0;
+
+                      return (
+                        <div key={index} className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/60 via-slate-700/60 to-slate-800/60 backdrop-blur-xl group hover:border-slate-600/50 transition-all duration-300 hover:scale-[1.02]">
+                          {/* Enhanced Team Header */}
+                          <div className={`relative p-5 bg-gradient-to-r ${index === 0 ? 'from-blue-600/30 to-blue-500/20' : 'from-emerald-600/30 to-emerald-500/20'}`}>
+                            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent"></div>
+                            <div className="relative flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${index === 0 ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 'bg-gradient-to-br from-emerald-500 to-emerald-600'}`}>
+                                  <span className="text-xl">🏏</span>
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-bold text-white">{innings.team}</h3>
+                                  <span className="text-slate-300 text-sm font-medium">Innings {index + 1}</span>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-3xl font-bold text-white">
+                                  {totalRuns}/{totalWickets}
+                                </div>
+                                <div className="text-slate-300 text-sm font-medium">
+                                  ({overs}.{balls} overs)
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Enhanced Stats */}
+                          <div className="p-5">
+                            <div className="grid grid-cols-4 gap-4">
+                              <div className="text-center">
+                                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                  <span className="text-white font-bold text-sm">{runRate.toFixed(1)}</span>
+                                </div>
+                                <div className="text-slate-400 text-xs font-medium">Run Rate</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                  <span className="text-white font-bold text-sm">{boundaries}</span>
+                                </div>
+                                <div className="text-slate-400 text-xs font-medium">Fours</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                  <span className="text-white font-bold text-sm">{sixes}</span>
+                                </div>
+                                <div className="text-slate-400 text-xs font-medium">Sixes</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                  <span className="text-white font-bold text-sm">{totalWickets}</span>
+                                </div>
+                                <div className="text-slate-400 text-xs font-medium">Wickets</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Team Comparison */}
+                {activeTab === 'overview' && (
+                  <>
+                    {matchSummary.teamStats.length >= 2 && (
+                      <StatsComparison teamStats={matchSummary.teamStats} />
+                    )}
+                    <OverviewTabContent 
+                      matchData={matchData}
+                      matchSummary={matchSummary}
+                      topBatsmen={topBatsmen}
+                      topBowlers={topBowlers}
+                      generateManhattanData={generateManhattanData}
+                    />
+                  </>
+                )}
+
+                {activeTab === 'players' && (
+                  <PlayersStatsGrid match={matchData} viewModel={viewModel} />
+                )}
+
+                {activeTab === 'batting' && (
+                  <BattingTabContent topBatsmen={topBatsmen} />
+                )}
+
+                {activeTab === 'bowling' && (
+                  <BowlingTabContent topBowlers={topBowlers} />
+                )}
+
+                {activeTab === 'analysis' && (
+                  <div className="space-y-4">
+                    {/* Cricket Insights */}
+                    <CricketInsights match={matchData} viewModel={viewModel} />
+                    
+                    {/* Micro Match Momentum Model */}
+                    <MicroMatchMomentum match={matchData} />
+                    
+                    {/* Ball-by-Ball Momentum Breakdown */}
+                    <BallByBallMomentumBreakdown match={matchData} />
+                    
+                    {/* PowerPlay Analysis */}
+                    <PowerPlayAnalysis match={matchData} />
+                    
+                    {/* Partnership Breakdown */}
+                    <PartnershipBreakdown match={matchData} />
+                    
+                    {/* Bowling Spell Analysis */}
+                    <BowlingSpellAnalysis match={matchData} />
+                    
+                    {/* Match Momentum */}
+                    <MatchMomentum match={matchData} />
+                  </div>
+                )}
+
+                {activeTab === 'overs' && (
+                  <>
+                    {/* Compact Innings Selector */}
+                    <div className="mb-3">
+                      <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-1.5">
+                        <span>📈</span>
+                        Select Innings
+                      </h3>
+                      <div className="flex gap-1.5">
+                        {(matchData.innings || []).map((innings, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setSelectedInnings(index)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                              selectedInnings === index
+                                ? 'bg-orange-500 text-white'
+                                : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50 hover:text-white'
+                            }`}
+                          >
+                            {innings.team}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Over by Over Cards */}
+                    {matchData.innings?.[selectedInnings] && (
+                      <div>
+                        <h3 className="text-base font-semibold text-white mb-3 flex items-center gap-1.5">
+                          <span>🏏</span>
+                          {matchData.innings[selectedInnings].team} - Over by Over
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {matchData.innings[selectedInnings].overs.map((over, index) => (
+                            <OverByOverCard 
+                              key={index} 
+                              over={over} 
+                              overNumber={index + 1} 
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {activeTab === 'commentary' && (
+                  <>
+                    {/* Compact Innings Selector for Commentary */}
+                    <div className="mb-3">
+                      <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-1.5">
+                        <span>🎙️</span>
+                        Select Innings for Commentary
+                      </h3>
+                      <div className="flex gap-1.5">
+                        {(matchData.innings || []).map((innings, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setSelectedInnings(index)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                              selectedInnings === index
+                                ? 'bg-purple-500 text-white'
+                                : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50 hover:text-white'
+                            }`}
+                          >
+                            {innings.team}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Live Commentary */}
+                    {matchData.innings?.[selectedInnings] && (
+                      <LiveCommentary 
+                        innings={matchData.innings[selectedInnings]}
+                        title={`${matchData.innings[selectedInnings].team} Live Commentary`}
+                        maxItems={15}
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

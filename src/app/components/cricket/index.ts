@@ -35,4 +35,5 @@ export { PowerPlayAnalysis } from './PowerPlayAnalysis';
 export { PartnershipBreakdown } from './PartnershipBreakdown';
 export { BowlingSpellAnalysis } from './BowlingSpellAnalysis';
 export { MatchMomentum } from './MatchMomentum';
-export { MicroMatchMomentum } from './MicroMatchMomentum'; 
+export { MicroMatchMomentum } from './MicroMatchMomentum';
+export { BallByBallMomentumBreakdown } from './BallByBallMomentumBreakdown'; 

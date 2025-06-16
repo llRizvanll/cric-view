@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-export type TabType = 'overview' | 'players' | 'batting' | 'bowling' | 'overs' | 'analysis' | 'commentary';
+export type TabType = 'overview' | 'players' | 'batting' | 'bowling' | 'overs' | 'analysis' | 'commentary' | 'scorecard';
 
 interface Tab {
   id: TabType;
