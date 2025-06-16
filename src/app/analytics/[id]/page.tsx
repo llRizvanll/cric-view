@@ -1,4 +1,4 @@
-import { CricketAnalyticsScreen } from '../../screens/cricket/CricketAnalyticsScreen';
+import { EnhancedMatchAnalyticsScreen } from '../../screens/cricket/EnhancedMatchAnalyticsScreen';
 
 interface AnalyticsPageProps {
   params: {
@@ -7,5 +7,5 @@ interface AnalyticsPageProps {
 }
 
 export default function AnalyticsPage({ params }: AnalyticsPageProps) {
-  return <CricketAnalyticsScreen matchId={params.id} />;
+  return <EnhancedMatchAnalyticsScreen matchId={params.id} />;
 } 
