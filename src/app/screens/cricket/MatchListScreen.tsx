@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { CricketMatch } from '../../models/CricketMatchModel';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface PaginationInfo {
   total: number;
@@ -340,6 +341,7 @@ const LoadingSkeleton = React.memo(() => (
 LoadingSkeleton.displayName = 'LoadingSkeleton';
 
 export const MatchListScreen: React.FC = () => {
+  const router = useRouter();
   const [allMatches, setAllMatches] = useState<CricketMatch[]>([]);
   const [availableMatchTypes, setAvailableMatchTypes] = useState<string[]>([]);
   const [availableYears, setAvailableYears] = useState<string[]>([]);
@@ -829,8 +831,35 @@ export const MatchListScreen: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Navigation Header */}
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => router.push('/')}
+                className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+              >
+                <div className="text-2xl">🏏</div>
+                <span className="text-xl font-bold text-gray-900">CricInfo Analytics</span>
+              </button>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">Cricket Matches</span>
+              <button
+                onClick={() => router.push('/')}
+                className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+              >
+                ← Back to Home
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       <div className="container mx-auto px-3 py-4 max-w-7xl">
-        {/* Minimal Header */}
+        {/* Page Header */}
         <div className="mb-4">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
