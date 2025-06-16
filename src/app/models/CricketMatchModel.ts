@@ -9,22 +9,25 @@ export interface CricketMatchEvent {
   name: string;
   group?: string;
   stage?: string;
+  sub_name?: string;
 }
 
 export interface CricketMatchOfficials {
-  match_referees: string[];
+  match_referees?: string[];
   reserve_umpires?: string[];
   tv_umpires?: string[];
-  umpires: string[];
+  umpires?: string[];
 }
 
 export interface CricketMatchOutcome {
   by?: {
     wickets?: number;
     runs?: number;
+    innings?: number;
   };
   method?: string;
-  winner: string;
+  winner?: string;
+  result?: string;
 }
 
 export interface CricketMatchToss {
@@ -33,26 +36,26 @@ export interface CricketMatchToss {
 }
 
 export interface CricketMatchInfo {
-  balls_per_over: number;
-  city: string;
+  balls_per_over?: number;
+  city?: string;
   dates: string[];
   event: CricketMatchEvent;
   gender: string;
   match_type: string;
   match_type_number?: number;
-  officials: CricketMatchOfficials;
+  officials?: CricketMatchOfficials;
   outcome: CricketMatchOutcome;
   overs?: number;
   player_of_match?: string[];
-  players: Record<string, string[]>;
-  registry: {
+  players?: Record<string, string[]>;
+  registry?: {
     people: Record<string, string>;
   };
-  season: string;
-  team_type: string;
+  season?: string;
+  team_type?: string;
   teams: string[];
-  toss: CricketMatchToss;
-  venue: string;
+  toss?: CricketMatchToss;
+  venue?: string;
 }
 
 export interface CricketReview {
@@ -105,7 +108,7 @@ export interface CricketInnings {
 export interface CricketMatch {
   meta: CricketMatchMeta;
   info: CricketMatchInfo;
-  innings: CricketInnings[];
+  innings?: CricketInnings[];
   matchId?: string;
 }
 
