@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run prebuild && next build",
+    "prebuild": "node scripts/prebuild-index.js",
     "start": "next start",
     "lint": "next lint"
   },

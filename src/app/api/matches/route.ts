@@ -3,20 +3,42 @@ import fs from 'fs/promises';
 import path from 'path';
 import { CricketMatch } from '../../models/CricketMatchModel';
 
-// In-memory cache for file list and match types
-let fileListCache: string[] | null = null;
-let matchTypesCache: Set<string> | null = null;
+// Enhanced caching system for better performance
+interface MatchMetadata {
+  matchId: string;
+  filename: string;
+  matchType: string;
+  date: string;
+  year: string;
+  teams: string[];
+  venue?: string;
+  city?: string;
+  event?: string;
+  season?: string;
+  outcome?: any;
+  fileSize: number;
+  lastModified: number;
+}
+
+interface CacheData {
+  metadata: MatchMetadata[];
+  matchTypes: string[];
+  years: string[];
+  totalCount: number;
+  lastUpdated: number;
+}
+
+// Global cache with TTL
+let globalCache: CacheData | null = null;
 let cacheTimestamp: number = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+const INDEX_FILE_PATH = path.join(process.cwd(), 'data', '.match-index.json');
 
-async function getFileList(): Promise<{ files: string[], matchTypes: Set<string> }> {
-  const now = Date.now();
+// Build metadata index from all files (only run when cache is empty or expired)
+async function buildMetadataIndex(): Promise<CacheData> {
+  console.log('Building metadata index...');
+  const startTime = Date.now();
   
-  // Return cached data if available and not expired
-  if (fileListCache && matchTypesCache && (now - cacheTimestamp) < CACHE_DURATION) {
-    return { files: fileListCache, matchTypes: matchTypesCache };
-  }
-
   const dataDir = path.join(process.cwd(), 'data');
   
   try {
@@ -29,35 +51,158 @@ async function getFileList(): Promise<{ files: string[], matchTypes: Set<string>
   const jsonFiles = allFiles.filter(file => 
     file.endsWith('.json') && 
     file !== '.DS_Store' && 
-    !file.startsWith('.')
+    !file.startsWith('.') &&
+    file !== '.match-index.json'
   );
 
-  // Build match types cache by reading a sample of files
+  const metadata: MatchMetadata[] = [];
   const matchTypes = new Set<string>();
-  const sampleSize = Math.min(100, jsonFiles.length); // Sample first 100 files for match types
+  const years = new Set<string>();
   
-  for (let i = 0; i < sampleSize; i++) {
-    try {
-      const filePath = path.join(dataDir, jsonFiles[i]);
-      const content = await fs.readFile(filePath, 'utf-8');
-      const matchData = JSON.parse(content);
-      
-      if (matchData.info?.match_type) {
-        matchTypes.add(matchData.info.match_type);
+  // Process files in batches for better memory management
+  const BATCH_SIZE = 50;
+  for (let i = 0; i < jsonFiles.length; i += BATCH_SIZE) {
+    const batch = jsonFiles.slice(i, i + BATCH_SIZE);
+    
+    await Promise.all(batch.map(async (file) => {
+      try {
+        const filePath = path.join(dataDir, file);
+        const stats = await fs.stat(filePath);
+        
+        // Read only the first part of the file to get metadata
+        const fileHandle = await fs.open(filePath, 'r');
+        const buffer = Buffer.alloc(Math.min(8192, stats.size)); // Read first 8KB
+        await fileHandle.read(buffer, 0, buffer.length, 0);
+        await fileHandle.close();
+        
+        const partialContent = buffer.toString('utf-8');
+        
+        // Try to extract just the info section using regex
+        let matchData;
+        try {
+          // First try to parse if we got complete JSON in first 8KB
+          matchData = JSON.parse(partialContent);
+        } catch {
+          // If not complete, try to extract just the info section
+          const infoMatch = partialContent.match(/"info":\s*{[^}]*"dates":\s*\[[^]]*\][^}]*}/);
+          if (infoMatch) {
+            try {
+              matchData = { info: JSON.parse(infoMatch[0].substring(7)) }; // Remove "info":
+            } catch {
+              // Fallback: read the full file (slower but accurate)
+              const fullContent = await fs.readFile(filePath, 'utf-8');
+              matchData = JSON.parse(fullContent);
+            }
+          } else {
+            // Fallback: read the full file
+            const fullContent = await fs.readFile(filePath, 'utf-8');
+            matchData = JSON.parse(fullContent);
+          }
+        }
+        
+        if (matchData?.info) {
+          const info = matchData.info;
+          const matchType = info.match_type || 'Unknown';
+          const date = info.dates?.[0] || '';
+          const year = date ? new Date(date).getFullYear().toString() : '';
+          
+          matchTypes.add(matchType);
+          if (year) years.add(year);
+          
+          metadata.push({
+            matchId: file.replace('.json', ''),
+            filename: file,
+            matchType,
+            date,
+            year,
+            teams: info.teams || [],
+            venue: info.venue,
+            city: info.city,
+            event: info.event?.name || info.event,
+            season: info.season,
+            outcome: info.outcome,
+            fileSize: stats.size,
+            lastModified: stats.mtime.getTime()
+          });
+        }
+      } catch (error) {
+        console.error(`Error processing file ${file}:`, error);
       }
-    } catch (error) {
-      console.error(`Error sampling file ${jsonFiles[i]}:`, error);
+    }));
+    
+    // Log progress every 500 files
+    if ((i + BATCH_SIZE) % 500 === 0 || i + BATCH_SIZE >= jsonFiles.length) {
+      console.log(`Processed ${Math.min(i + BATCH_SIZE, jsonFiles.length)}/${jsonFiles.length} files`);
     }
   }
 
-  // Cache the results
-  fileListCache = jsonFiles;
-  matchTypesCache = matchTypes;
-  cacheTimestamp = now;
+  // Sort metadata by date (latest first)
+  metadata.sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    return dateB - dateA;
+  });
 
-  return { files: jsonFiles, matchTypes };
+  const cacheData: CacheData = {
+    metadata,
+    matchTypes: Array.from(matchTypes).sort(),
+    years: Array.from(years).sort((a, b) => parseInt(b) - parseInt(a)),
+    totalCount: metadata.length,
+    lastUpdated: Date.now()
+  };
+
+  // Save index to disk for faster subsequent loads
+  try {
+    await fs.writeFile(INDEX_FILE_PATH, JSON.stringify(cacheData, null, 2));
+    console.log(`Metadata index saved to disk (${metadata.length} matches)`);
+  } catch (error) {
+    console.error('Failed to save index to disk:', error);
+  }
+
+  const duration = Date.now() - startTime;
+  console.log(`Metadata index built in ${duration}ms for ${metadata.length} matches`);
+  
+  return cacheData;
 }
 
+// Load metadata index from disk or build new one
+async function getMetadataIndex(): Promise<CacheData> {
+  const now = Date.now();
+  
+  // Return cached data if available and not expired
+  if (globalCache && (now - cacheTimestamp) < CACHE_DURATION) {
+    console.log('Using cached metadata index');
+    return globalCache;
+  }
+
+  try {
+    // Try to load from disk first
+    const indexContent = await fs.readFile(INDEX_FILE_PATH, 'utf-8');
+    const diskCache: CacheData = JSON.parse(indexContent);
+    
+    // Check if disk cache is recent enough (24 hours)
+    const DISK_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+    if ((now - diskCache.lastUpdated) < DISK_CACHE_DURATION) {
+      console.log(`Loaded metadata index from disk (${diskCache.metadata.length} matches)`);
+      globalCache = diskCache;
+      cacheTimestamp = now;
+      return diskCache;
+    } else {
+      console.log('Disk cache expired, rebuilding index...');
+    }
+  } catch (error) {
+    console.log('No disk cache found or error reading it, building new index...');
+  }
+
+  // Build new index
+  const newCache = await buildMetadataIndex();
+  globalCache = newCache;
+  cacheTimestamp = now;
+  
+  return newCache;
+}
+
+// Load individual match data when needed
 async function loadMatchFromFile(filename: string): Promise<CricketMatch | null> {
   try {
     const filePath = path.join(process.cwd(), 'data', filename);
@@ -100,14 +245,15 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const matchTypeFilter = searchParams.get('match_type');
+    const yearFilter = searchParams.get('year');
     const offset = (page - 1) * limit;
 
-    console.log(`API Request: page=${page}, limit=${limit}, filter=${matchTypeFilter}`);
+    console.log(`API Request: page=${page}, limit=${limit}, filter=${matchTypeFilter}, year=${yearFilter}`);
 
-    // Get cached file list and match types
-    const { files: allFiles, matchTypes } = await getFileList();
+    // Get metadata index (very fast now)
+    const cacheData = await getMetadataIndex();
     
-    if (allFiles.length === 0) {
+    if (cacheData.metadata.length === 0) {
       return NextResponse.json({
         matches: [],
         pagination: {
@@ -119,94 +265,51 @@ export async function GET(request: Request) {
           hasPrev: false
         },
         availableMatchTypes: [],
-        currentFilter: 'all'
+        availableYears: [],
+        currentFilter: 'all',
+        currentYear: 'all'
       });
     }
 
-    // If no filter is applied, use simple file-based pagination
-    if (!matchTypeFilter || matchTypeFilter === 'all') {
-      const totalFiles = allFiles.length;
-      const totalPages = Math.ceil(totalFiles / limit);
-      const paginatedFiles = allFiles.slice(offset, offset + limit);
-      
-      // Load only the files for this page
-      const matches = [];
-      for (const file of paginatedFiles) {
-        const matchData = await loadMatchFromFile(file);
-        if (matchData) {
-          matches.push(matchData);
-        }
-      }
-
-      console.log(`Loaded ${matches.length} matches for page ${page} (no filter)`);
-
-      return NextResponse.json({
-        matches,
-        pagination: {
-          total: totalFiles,
-          page,
-          limit,
-          totalPages,
-          hasNext: page < totalPages,
-          hasPrev: page > 1
-        },
-        availableMatchTypes: Array.from(matchTypes).sort(),
-        currentFilter: 'all'
-      });
+    // Filter metadata (very fast - no file I/O)
+    let filteredMetadata = cacheData.metadata;
+    
+    if (matchTypeFilter && matchTypeFilter !== 'all') {
+      filteredMetadata = filteredMetadata.filter(meta => 
+        meta.matchType.toLowerCase() === matchTypeFilter.toLowerCase()
+      );
+    }
+    
+    if (yearFilter && yearFilter !== 'all') {
+      filteredMetadata = filteredMetadata.filter(meta => meta.year === yearFilter);
     }
 
-    // For filtered requests, we need to check files to apply the filter
-    // This is more expensive but necessary for accurate pagination
-    console.log(`Filtering for match type: ${matchTypeFilter}`);
+    // Apply pagination to filtered metadata
+    const total = filteredMetadata.length;
+    const totalPages = Math.ceil(total / limit);
+    const paginatedMetadata = filteredMetadata.slice(offset, offset + limit);
     
-    const filteredMatches = [];
-    let processedCount = 0;
-    let skippedCount = 0;
-    
-    // Process files in batches to avoid loading too many at once
-    for (const file of allFiles) {
-      if (filteredMatches.length >= offset + limit) {
-        break; // We have enough matches
-      }
-      
-      const matchData = await loadMatchFromFile(file);
-      processedCount++;
-      
-      if (matchData && matchData.info.match_type?.toLowerCase() === matchTypeFilter.toLowerCase()) {
-        if (filteredMatches.length >= offset) {
-          // We're in the target page range
-          filteredMatches.push(matchData);
-        } else {
-          // Count this match but don't include it (it's before our target page)
-          skippedCount++;
-        }
-      }
+    // Now load only the required match files (much faster!)
+    const matchPromises = paginatedMetadata.map(meta => loadMatchFromFile(meta.filename));
+    const matches = await Promise.all(matchPromises);
+    const validMatches = matches.filter(match => match !== null) as CricketMatch[];
 
-      // Every 50 files, log progress
-      if (processedCount % 50 === 0) {
-        console.log(`Processed ${processedCount}/${allFiles.length} files, found ${filteredMatches.length + skippedCount} matches`);
-      }
-    }
-
-    // Calculate pagination info for filtered results
-    const totalFilteredMatches = filteredMatches.length + skippedCount;
-    const totalPages = Math.ceil(totalFilteredMatches / limit);
-    const actualMatches = filteredMatches.slice(0, limit);
-
-    console.log(`Filtering complete: ${actualMatches.length} matches for page ${page}, total filtered: ${totalFilteredMatches}`);
+    console.log(`Loaded ${validMatches.length} matches for page ${page} in optimized mode (filter: ${matchTypeFilter || 'all'}, year: ${yearFilter || 'all'})`);
 
     return NextResponse.json({
-      matches: actualMatches,
+      matches: validMatches,
       pagination: {
-        total: totalFilteredMatches,
+        total,
         page,
         limit,
         totalPages,
-        hasNext: filteredMatches.length === limit, // Simple heuristic
+        hasNext: page < totalPages,
         hasPrev: page > 1
       },
-      availableMatchTypes: Array.from(matchTypes).sort(),
-      currentFilter: matchTypeFilter
+      availableMatchTypes: cacheData.matchTypes,
+      availableYears: cacheData.years,
+      currentFilter: matchTypeFilter || 'all',
+      currentYear: yearFilter || 'all'
     });
     
   } catch (error) {
