@@ -28,7 +28,13 @@ import {
   // Tab content components
   OverviewTabContent,
   BattingTabContent,
-  BowlingTabContent
+  BowlingTabContent,
+  // New cricket analysis components
+  CricketInsights,
+  PowerPlayAnalysis,
+  PartnershipBreakdown,
+  BowlingSpellAnalysis,
+  MatchMomentum
 } from '../../components/cricket';
 
 interface EnhancedMatchAnalyticsScreenProps {
@@ -333,6 +339,7 @@ export const EnhancedMatchAnalyticsScreen: React.FC<EnhancedMatchAnalyticsScreen
               { id: 'batting', label: 'Batting', icon: '🏏' },
               { id: 'bowling', label: 'Bowling', icon: '⚾' },
               { id: 'overs', label: 'Overs', icon: '📈' },
+              { id: 'analysis', label: 'Deep Analysis', icon: '🔍' },
               { id: 'commentary', label: 'Commentary', icon: '🎙️' }
             ].map((tab) => (
               <button
@@ -373,6 +380,25 @@ export const EnhancedMatchAnalyticsScreen: React.FC<EnhancedMatchAnalyticsScreen
 
           {activeTab === 'bowling' && (
             <BowlingTabContent topBowlers={topBowlers} />
+          )}
+
+          {activeTab === 'analysis' && (
+            <div className="space-y-4">
+              {/* Cricket Insights */}
+              <CricketInsights match={matchData} viewModel={viewModel} />
+              
+              {/* PowerPlay Analysis */}
+              <PowerPlayAnalysis match={matchData} />
+              
+              {/* Partnership Breakdown */}
+              <PartnershipBreakdown match={matchData} />
+              
+              {/* Bowling Spell Analysis */}
+              <BowlingSpellAnalysis match={matchData} />
+              
+              {/* Match Momentum */}
+              <MatchMomentum match={matchData} />
+            </div>
           )}
 
           {activeTab === 'overs' && (

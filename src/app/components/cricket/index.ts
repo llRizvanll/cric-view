@@ -27,4 +27,11 @@ export { InningsSelector } from './InningsSelector';
 // Tab content components
 export { OverviewTabContent } from './OverviewTabContent';
 export { BattingTabContent } from './BattingTabContent';
-export { BowlingTabContent } from './BowlingTabContent'; 
+export { BowlingTabContent } from './BowlingTabContent';
+
+// New cricket analysis components
+export { CricketInsights } from './CricketInsights';
+export { PowerPlayAnalysis } from './PowerPlayAnalysis';
+export { PartnershipBreakdown } from './PartnershipBreakdown';
+export { BowlingSpellAnalysis } from './BowlingSpellAnalysis';
+export { MatchMomentum } from './MatchMomentum'; 
