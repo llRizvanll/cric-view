@@ -5,6 +5,7 @@ export { LineChart } from './LineChart';
 
 // New enhanced components
 export { ScoreCard } from './ScoreCard';
+export { DetailedScorecard } from './DetailedScorecard';
 export { PlayerCard } from './PlayerCard';
 export { MatchHeader } from './MatchHeader';
 export { LiveCommentary } from './LiveCommentary';
@@ -30,10 +31,17 @@ export { BattingTabContent } from './BattingTabContent';
 export { BowlingTabContent } from './BowlingTabContent';
 
 // New cricket analysis components
-export { CricketInsights } from './CricketInsights';
 export { PowerPlayAnalysis } from './PowerPlayAnalysis';
 export { PartnershipBreakdown } from './PartnershipBreakdown';
 export { BowlingSpellAnalysis } from './BowlingSpellAnalysis';
-export { MatchMomentum } from './MatchMomentum';
 export { MicroMatchMomentum } from './MicroMatchMomentum';
-export { BallByBallMomentumBreakdown } from './BallByBallMomentumBreakdown'; 
+export { BallByBallMomentumBreakdown } from './BallByBallMomentumBreakdown';
+
+// Responsive Components
+export { ResponsiveNavigation } from './ResponsiveNavigation';
+export { 
+  ResponsiveContainer, 
+  ResponsiveGrid, 
+  ResponsiveCard, 
+  ResponsiveFlex 
+} from './ResponsiveContainer'; 

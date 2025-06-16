@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { CricketMatch, PlayerStats, BowlingStats } from '../../models/CricketMatchModel';
 import { CricketAnalyticsViewModel } from '../../viewmodels/CricketAnalyticsViewModel';
+import { getResponsiveGap, getResponsiveText, useResponsive } from '../../utils/responsive';
 
 interface PlayersStatsGridProps {
   match: CricketMatch;
@@ -19,6 +20,7 @@ interface CombinedPlayerStats {
 export const PlayersStatsGrid: React.FC<PlayersStatsGridProps> = ({ match, viewModel }) => {
   const [selectedTeam, setSelectedTeam] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'name' | 'runs' | 'wickets' | 'strikeRate'>('runs');
+  const { isMobile, isTablet } = useResponsive();
 
   // Combine all player statistics using the viewModel
   const getAllPlayers = (): CombinedPlayerStats[] => {
@@ -115,20 +117,20 @@ export const PlayersStatsGrid: React.FC<PlayersStatsGridProps> = ({ match, viewM
   };
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-xl p-3">
+    <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-xl p-2 md:p-3 lg:p-4">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 space-y-2 md:space-y-0">
-        <h2 className="text-base font-bold text-white flex items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 space-y-2 sm:space-y-0">
+        <h2 className={`${getResponsiveText('text-sm', 'md:text-base', 'lg:text-lg')} font-bold text-white flex items-center`}>
           <span className="mr-1.5">👥</span>
           Players Statistics
         </h2>
         
-        <div className="flex flex-col md:flex-row space-y-1.5 md:space-y-0 md:space-x-2">
+        <div className={`flex ${isMobile ? 'flex-col w-full' : 'flex-row'} ${getResponsiveGap('gap-1.5', 'md:gap-2', 'lg:gap-3')}`}>
           {/* Team Filter */}
           <select
             value={selectedTeam}
             onChange={(e) => setSelectedTeam(e.target.value)}
-            className="px-2 py-1 text-xs border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            className={`px-2 py-1 ${getResponsiveText('text-xs', 'md:text-sm')} border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${isMobile ? 'w-full' : ''}`}
           >
             <option value="all">All Teams</option>
             {teams.map(team => (
@@ -140,7 +142,7 @@ export const PlayersStatsGrid: React.FC<PlayersStatsGridProps> = ({ match, viewM
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-2 py-1 text-xs border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            className={`px-2 py-1 ${getResponsiveText('text-xs', 'md:text-sm')} border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${isMobile ? 'w-full' : ''}`}
           >
             <option value="runs">Sort by Runs</option>
             <option value="wickets">Sort by Wickets</option>
@@ -151,7 +153,7 @@ export const PlayersStatsGrid: React.FC<PlayersStatsGridProps> = ({ match, viewM
       </div>
 
       {/* Players Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-3">
+      <div className={`grid ${isMobile ? 'grid-cols-1' : isTablet ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'} ${getResponsiveGap('gap-2', 'md:gap-3', 'lg:gap-4')} mb-3`}>
         {sortedPlayers.map((player, index) => (
           <div 
             key={`${player.name}-${player.team}`}

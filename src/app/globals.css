@@ -10,8 +10,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-roboto-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,5 +24,56 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+/* Responsive utilities */
+@layer utilities {
+  .responsive-text-xs {
+    @apply text-xs sm:text-sm md:text-base;
+  }
+  
+  .responsive-text-sm {
+    @apply text-sm sm:text-base md:text-lg;
+  }
+  
+  .responsive-text-base {
+    @apply text-base sm:text-lg md:text-xl;
+  }
+  
+  .responsive-text-lg {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+  
+  .responsive-padding-sm {
+    @apply p-2 sm:p-3 md:p-4;
+  }
+  
+  .responsive-padding-md {
+    @apply p-3 sm:p-4 md:p-6;
+  }
+  
+  .responsive-padding-lg {
+    @apply p-4 sm:p-6 md:p-8;
+  }
+  
+  .responsive-margin-sm {
+    @apply m-2 sm:m-3 md:m-4;
+  }
+  
+  .responsive-margin-md {
+    @apply m-3 sm:m-4 md:m-6;
+  }
+  
+  .responsive-grid-1 {
+    @apply grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+  }
+  
+  .responsive-grid-2 {
+    @apply grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4;
+  }
+  
+  .responsive-gap {
+    @apply gap-2 sm:gap-3 md:gap-4 lg:gap-6;
+  }
 }
