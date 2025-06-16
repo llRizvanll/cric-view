@@ -34,7 +34,8 @@ import {
   PowerPlayAnalysis,
   PartnershipBreakdown,
   BowlingSpellAnalysis,
-  MatchMomentum
+  MatchMomentum,
+  MicroMatchMomentum
 } from '../../components/cricket';
 
 interface EnhancedMatchAnalyticsScreenProps {
@@ -386,6 +387,9 @@ export const EnhancedMatchAnalyticsScreen: React.FC<EnhancedMatchAnalyticsScreen
             <div className="space-y-4">
               {/* Cricket Insights */}
               <CricketInsights match={matchData} viewModel={viewModel} />
+              
+              {/* Micro Match Momentum Model */}
+              <MicroMatchMomentum match={matchData} />
               
               {/* PowerPlay Analysis */}
               <PowerPlayAnalysis match={matchData} />

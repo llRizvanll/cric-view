@@ -34,4 +34,5 @@ export { CricketInsights } from './CricketInsights';
 export { PowerPlayAnalysis } from './PowerPlayAnalysis';
 export { PartnershipBreakdown } from './PartnershipBreakdown';
 export { BowlingSpellAnalysis } from './BowlingSpellAnalysis';
-export { MatchMomentum } from './MatchMomentum'; 
+export { MatchMomentum } from './MatchMomentum';
+export { MicroMatchMomentum } from './MicroMatchMomentum'; 
