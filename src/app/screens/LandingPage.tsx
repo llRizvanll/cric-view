@@ -7,6 +7,8 @@ export const LandingPage: React.FC = () => {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
+  const [ballPosition, setBallPosition] = useState({ x: 0, y: 0 });
+  const [batRotation, setBatRotation] = useState(0);
 
   useEffect(() => {
     setIsVisible(true);
@@ -16,7 +18,24 @@ export const LandingPage: React.FC = () => {
       setActiveFeature(prev => (prev + 1) % 6);
     }, 3000);
 
-    return () => clearInterval(interval);
+    // Animate cricket ball movement
+    const ballAnimation = setInterval(() => {
+      setBallPosition(prev => ({
+        x: (prev.x + 2) % 100,
+        y: Math.sin(prev.x * 0.1) * 20 + 50
+      }));
+    }, 50);
+
+    // Animate bat rotation
+    const batAnimation = setInterval(() => {
+      setBatRotation(prev => (prev + 0.5) % 360);
+    }, 100);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(ballAnimation);
+      clearInterval(batAnimation);
+    };
   }, []);
 
   const features = [
@@ -91,21 +110,109 @@ export const LandingPage: React.FC = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero Section with Cricket Animations */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 py-20">
+        {/* Animated Cricket Ground */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Cricket Field */}
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-96 h-48 opacity-20">
+            <svg viewBox="0 0 400 200" className="w-full h-full">
+              {/* Outer boundary */}
+              <ellipse cx="200" cy="180" rx="180" ry="60" fill="none" stroke="#22c55e" strokeWidth="2" strokeDasharray="5,5" className="animate-pulse" />
+              {/* Inner circle */}
+              <ellipse cx="200" cy="180" rx="80" ry="25" fill="none" stroke="#15803d" strokeWidth="2" />
+              {/* Pitch */}
+              <rect x="185" y="160" width="30" height="40" fill="#a3a3a3" opacity="0.5" rx="2" />
+              {/* Stumps */}
+              <rect x="198" y="158" width="1" height="6" fill="#8b5cf6" />
+              <rect x="200" y="158" width="1" height="6" fill="#8b5cf6" />
+              <rect x="202" y="158" width="1" height="6" fill="#8b5cf6" />
+              <rect x="198" y="196" width="1" height="6" fill="#8b5cf6" />
+              <rect x="200" y="196" width="1" height="6" fill="#8b5cf6" />
+              <rect x="202" y="196" width="1" height="6" fill="#8b5cf6" />
+            </svg>
+          </div>
+
+          {/* Animated Cricket Ball */}
+          <div 
+            className="absolute w-4 h-4 bg-gradient-to-br from-red-600 to-red-800 rounded-full shadow-lg transition-all duration-75 ease-linear"
+            style={{
+              left: `${ballPosition.x}%`,
+              top: `${ballPosition.y}%`,
+              transform: `rotate(${ballPosition.x * 4}deg)`,
+            }}
+          >
+            {/* Ball seam */}
+            <div className="absolute inset-0 rounded-full border border-red-900 opacity-60"></div>
+            <div className="absolute top-1/2 left-0 right-0 h-px bg-red-900 opacity-40"></div>
+          </div>
+
+          {/* Animated Cricket Bat */}
+          <div 
+            className="absolute top-1/2 right-1/4 w-16 h-4 origin-bottom transition-transform duration-100"
+            style={{ transform: `rotate(${batRotation}deg)` }}
+          >
+            <svg viewBox="0 0 60 16" className="w-full h-full">
+              {/* Bat blade */}
+              <rect x="0" y="6" width="45" height="4" fill="#d97706" rx="2" />
+              {/* Bat handle */}
+              <rect x="45" y="7" width="12" height="2" fill="#92400e" rx="1" />
+              {/* Grip */}
+              <rect x="52" y="6.5" width="6" height="3" fill="#374151" rx="1.5" />
+            </svg>
+          </div>
+
+          {/* Flying Cricket Ball Trail */}
+          <div className="absolute top-1/3 left-1/4 w-2 h-2 bg-red-500 rounded-full opacity-60 animate-ping"></div>
+          <div className="absolute top-2/3 right-1/3 w-1 h-1 bg-red-400 rounded-full opacity-40 animate-pulse delay-500"></div>
+          
+          {/* Floating Stumps */}
+          <div className="absolute top-1/4 left-1/6 transform rotate-12 animate-bounce delay-1000">
+            <svg width="20" height="30" viewBox="0 0 20 30">
+              <rect x="2" y="0" width="2" height="25" fill="#8b5cf6" />
+              <rect x="9" y="0" width="2" height="25" fill="#8b5cf6" />
+              <rect x="16" y="0" width="2" height="25" fill="#8b5cf6" />
+              <rect x="0" y="0" width="20" height="3" fill="#f59e0b" rx="1" />
+            </svg>
+          </div>
+
+          {/* Floating Boundary Rope */}
+          <div className="absolute bottom-1/4 right-1/6 animate-pulse delay-700">
+            <div className="w-8 h-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full opacity-70"></div>
+          </div>
+
+          {/* Animated Score Display */}
+          <div className="absolute top-1/6 right-1/4 bg-black/20 backdrop-blur-sm rounded-lg p-2 animate-pulse delay-300">
+            <div className="text-green-400 font-mono text-xs">
+              <div className="flex space-x-2">
+                <span>IND</span>
+                <span className="text-white">284/6</span>
+              </div>
+              <div className="text-yellow-400 text-xs">48.2 overs</div>
+            </div>
+          </div>
+
+          {/* Particle Effects */}
+          <div className="absolute top-1/4 left-1/2 w-1 h-1 bg-blue-400 rounded-full animate-ping delay-200"></div>
+          <div className="absolute top-3/4 left-1/3 w-1 h-1 bg-green-400 rounded-full animate-ping delay-700"></div>
+          <div className="absolute top-1/2 right-1/5 w-1 h-1 bg-purple-400 rounded-full animate-ping delay-1000"></div>
+        </div>
+
+        {/* Main Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="mb-8">
-              <div className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-full text-blue-700 text-sm font-medium mb-6">
-                <span className="mr-2">🚀</span>
+              <div className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-full text-blue-700 text-sm font-medium mb-6 animate-pulse">
+                <span className="mr-2 animate-bounce">🚀</span>
                 Advanced Cricket Analytics Platform
               </div>
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              Cricket Analytics
+              <span className="inline-block animate-pulse">Cricket</span>
+              <span className="inline-block mx-4">Analytics</span>
               <br />
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 bg-clip-text text-transparent animate-pulse delay-500">
                 Reimagined
               </span>
             </h1>
@@ -118,22 +225,64 @@ export const LandingPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
                 onClick={() => router.push('/cricket/matches')}
-                className="bg-blue-600 text-white px-8 py-4 rounded-2xl text-lg font-semibold hover:bg-blue-700 transition-all duration-200 hover:scale-105 shadow-lg"
+                className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 hover:scale-105 shadow-lg transform hover:shadow-xl"
               >
-                Explore Live Demo
+                <span className="flex items-center space-x-2">
+                  <span>Explore Live Demo</span>
+                  <span className="group-hover:translate-x-1 transition-transform">🏏</span>
+                </span>
               </button>
-              <button className="text-gray-600 hover:text-gray-900 px-8 py-4 text-lg font-medium transition-colors">
-                Watch Demo Video →
+              <button className="group text-gray-600 hover:text-gray-900 px-8 py-4 text-lg font-medium transition-colors">
+                <span className="flex items-center space-x-2">
+                  <span>Watch Demo Video</span>
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </span>
               </button>
             </div>
           </div>
         </div>
         
-        {/* Floating Elements */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-blue-100 rounded-full opacity-60 animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-32 h-32 bg-purple-100 rounded-full opacity-40 animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 right-1/4 w-16 h-16 bg-green-100 rounded-full opacity-50 animate-pulse delay-500"></div>
+        {/* Enhanced Floating Elements with Cricket Theme */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-green-200 to-green-300 rounded-full opacity-60 animate-pulse flex items-center justify-center">
+          <span className="text-2xl animate-spin-slow">🏏</span>
+        </div>
+        <div className="absolute bottom-20 right-10 w-32 h-32 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full opacity-40 animate-pulse delay-1000 flex items-center justify-center">
+          <span className="text-4xl animate-bounce">⚾</span>
+        </div>
+        <div className="absolute top-1/2 right-1/4 w-16 h-16 bg-gradient-to-br from-yellow-200 to-orange-200 rounded-full opacity-50 animate-pulse delay-500 flex items-center justify-center">
+          <span className="text-xl animate-ping">🎯</span>
+        </div>
+        
+        {/* Wicket Animation */}
+        <div className="absolute top-1/3 left-1/12 animate-bounce delay-700">
+          <svg width="24" height="32" viewBox="0 0 24 32" className="transform rotate-12">
+            <rect x="3" y="2" width="2" height="25" fill="#8b5cf6" />
+            <rect x="11" y="2" width="2" height="25" fill="#8b5cf6" />
+            <rect x="19" y="2" width="2" height="25" fill="#8b5cf6" />
+            <rect x="0" y="0" width="24" height="4" fill="#f59e0b" rx="2" />
+            <rect x="0" y="8" width="24" height="2" fill="#f59e0b" rx="1" />
+          </svg>
+        </div>
+
+        {/* Cricket Stadium Lights */}
+        <div className="absolute top-10 left-1/3 w-4 h-8 bg-gradient-to-t from-yellow-400 to-yellow-200 rounded-full opacity-70 animate-pulse">
+          <div className="absolute top-0 left-1/2 w-8 h-1 bg-yellow-300 transform -translate-x-1/2 rounded-full opacity-60"></div>
+        </div>
+        <div className="absolute top-16 right-1/3 w-4 h-8 bg-gradient-to-t from-yellow-400 to-yellow-200 rounded-full opacity-70 animate-pulse delay-500">
+          <div className="absolute top-0 left-1/2 w-8 h-1 bg-yellow-300 transform -translate-x-1/2 rounded-full opacity-60"></div>
+        </div>
       </section>
+
+      {/* Add custom CSS for slow spin animation */}
+      <style jsx>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 3s linear infinite;
+        }
+      `}</style>
 
       {/* Stats Section */}
       <section className="py-16 bg-gray-50">
