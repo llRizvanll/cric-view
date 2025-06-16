@@ -12,12 +12,11 @@ export const StatsComparison: React.FC<StatsComparisonProps> = ({
 }) => {
   if (!teamStats || teamStats.length < 2) {
     return (
-      <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-xl p-3">
-        <h3 className="text-base font-semibold text-white mb-1.5 flex items-center gap-1.5">
-          <span>⚖️</span>
-          {title}
-        </h3>
-        <p className="text-gray-400 text-xs">Insufficient data for comparison</p>
+      <div className="bg-gray-50 rounded-2xl border border-gray-200 p-8">
+        <div className="text-center">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
+          <p className="text-gray-600">Insufficient data for comparison</p>
+        </div>
       </div>
     );
   }
@@ -47,33 +46,33 @@ export const StatsComparison: React.FC<StatsComparisonProps> = ({
     const team2Percentage = maxValue > 0 ? (value2 / maxValue) * 100 : 0;
     
     return (
-      <div className="bg-gray-700/30 rounded-lg p-2">
+      <div className="bg-gray-50 rounded-xl p-4">
         {/* Header */}
-        <div className="flex items-center justify-center gap-1.5 mb-2">
-          <span className="text-xs">{icon}</span>
-          <div className="text-white font-medium text-xs">{label}</div>
+        <div className="text-center mb-4">
+          <div className="text-2xl mb-2">{icon}</div>
+          <div className="text-gray-900 font-medium text-sm">{label}</div>
         </div>
         
         {/* Team Comparison */}
-        <div className="grid grid-cols-3 items-center gap-2">
+        <div className="grid grid-cols-3 items-center gap-4">
           {/* Team 1 */}
           <div className="text-center">
-            <div className={`text-sm font-bold ${
-              team1Better ? 'text-green-300' : 
-              team2Better ? 'text-red-300' : 
-              'text-white'
+            <div className={`text-lg font-bold mb-1 ${
+              team1Better ? 'text-green-600' : 
+              team2Better ? 'text-red-500' : 
+              'text-gray-900'
             }`}>
               {value1}{unit}
             </div>
-            <div className="text-gray-400 text-xs truncate">{team1.team}</div>
+            <div className="text-gray-600 text-xs font-medium truncate mb-2">{team1.team}</div>
             
             {/* Progress Bar */}
-            <div className="w-full bg-gray-600/30 rounded-full h-1 mt-1 overflow-hidden">
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
               <div 
                 className={`h-full rounded-full transition-all duration-500 ${
-                  team1Better ? 'bg-green-400' :
-                  team2Better ? 'bg-red-400' :
-                  'bg-blue-400'
+                  team1Better ? 'bg-green-500' :
+                  team2Better ? 'bg-red-500' :
+                  'bg-blue-500'
                 }`}
                 style={{ width: `${team1Percentage}%` }}
               ></div>
@@ -82,29 +81,29 @@ export const StatsComparison: React.FC<StatsComparisonProps> = ({
           
           {/* VS Indicator */}
           <div className="text-center">
-            <div className="w-6 h-6 mx-auto bg-gray-600/30 rounded-full flex items-center justify-center">
-              <span className="text-gray-400 font-bold text-xs">VS</span>
+            <div className="w-8 h-8 mx-auto bg-gray-200 rounded-full flex items-center justify-center">
+              <span className="text-gray-600 font-bold text-xs">VS</span>
             </div>
           </div>
           
           {/* Team 2 */}
           <div className="text-center">
-            <div className={`text-sm font-bold ${
-              team2Better ? 'text-green-300' : 
-              team1Better ? 'text-red-300' : 
-              'text-white'
+            <div className={`text-lg font-bold mb-1 ${
+              team2Better ? 'text-green-600' : 
+              team1Better ? 'text-red-500' : 
+              'text-gray-900'
             }`}>
               {value2}{unit}
             </div>
-            <div className="text-gray-400 text-xs truncate">{team2.team}</div>
+            <div className="text-gray-600 text-xs font-medium truncate mb-2">{team2.team}</div>
             
             {/* Progress Bar */}
-            <div className="w-full bg-gray-600/30 rounded-full h-1 mt-1 overflow-hidden">
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
               <div 
                 className={`h-full rounded-full transition-all duration-500 ${
-                  team2Better ? 'bg-green-400' :
-                  team1Better ? 'bg-red-400' :
-                  'bg-purple-400'
+                  team2Better ? 'bg-green-500' :
+                  team1Better ? 'bg-red-500' :
+                  'bg-purple-500'
                 }`}
                 style={{ width: `${team2Percentage}%` }}
               ></div>
@@ -116,17 +115,15 @@ export const StatsComparison: React.FC<StatsComparisonProps> = ({
   };
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-xl p-3">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="text-center mb-3">
-        <h3 className="text-base font-bold text-white mb-0.5 flex items-center justify-center gap-1.5">
-          <span>⚖️</span>
-          {title}
-        </h3>
-        <div className="text-gray-400 text-xs">Head-to-head analysis</div>
+      <div className="text-center">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
+        <p className="text-gray-600">Head-to-head statistical comparison</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+      {/* Comparison Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <ComparisonItem
           label="Total Runs"
           value1={team1.totalRuns}
@@ -172,28 +169,26 @@ export const StatsComparison: React.FC<StatsComparisonProps> = ({
       </div>
       
       {/* Winner Highlight */}
-      <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-2">
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
         <div className="text-center">
-          <div className="flex items-center justify-center gap-1.5 mb-0.5">
-            <span className="text-sm">🏆</span>
-            <div className="text-blue-300 font-semibold text-xs">Higher Scorer</div>
-          </div>
+          <div className="text-3xl mb-3">🏆</div>
+          <div className="text-blue-900 font-semibold text-sm mb-2">Match Leader</div>
           
-          <div className="text-lg font-bold text-white mb-0.5">
+          <div className="text-2xl font-bold text-gray-900 mb-2">
             {team1.totalRuns > team2.totalRuns ? team1.team : 
              team2.totalRuns > team1.totalRuns ? team2.team : 
              'Perfect Tie!'}
           </div>
           
           {team1.totalRuns !== team2.totalRuns && (
-            <div className="text-blue-300 text-xs">
-              Victory margin: {Math.abs(team1.totalRuns - team2.totalRuns)} runs
+            <div className="text-blue-700 text-sm">
+              Leading by {Math.abs(team1.totalRuns - team2.totalRuns)} runs
             </div>
           )}
           
           {team1.totalRuns === team2.totalRuns && (
-            <div className="text-yellow-300 text-xs">
-              Exact same score!
+            <div className="text-amber-700 text-sm">
+              Both teams scored exactly the same!
             </div>
           )}
         </div>

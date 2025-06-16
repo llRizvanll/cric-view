@@ -8,32 +8,57 @@ interface QuickStatsCardsProps {
 }
 
 export const QuickStatsCards: React.FC<QuickStatsCardsProps> = ({ matchSummary }) => {
+  const stats = [
+    {
+      value: Math.max(...matchSummary.teamStats.map(t => t.totalRuns)),
+      label: 'Highest Score',
+      description: 'Maximum team total',
+      icon: '🏆',
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50'
+    },
+    {
+      value: matchSummary.teamStats.reduce((sum, t) => sum + t.boundaries, 0),
+      label: 'Total Boundaries',
+      description: 'Fours scored by both teams',
+      icon: '🎯',
+      color: 'text-green-600',
+      bgColor: 'bg-green-50'
+    },
+    {
+      value: matchSummary.teamStats.reduce((sum, t) => sum + t.sixes, 0),
+      label: 'Total Sixes',
+      description: 'Maximum hits by both teams',
+      icon: '🚀',
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50'
+    },
+    {
+      value: matchSummary.teamStats.reduce((sum, t) => sum + t.totalWickets, 0),
+      label: 'Total Wickets',
+      description: 'Wickets fallen in the match',
+      icon: '🎳',
+      color: 'text-red-600',
+      bgColor: 'bg-red-50'
+    }
+  ];
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div className="bg-white rounded-lg shadow p-4 text-center">
-        <div className="text-2xl font-bold text-blue-600">
-          {Math.max(...matchSummary.teamStats.map(t => t.totalRuns))}
+      {stats.map((stat, index) => (
+        <div key={index} className={`${stat.bgColor} rounded-xl p-6 text-center border border-gray-200`}>
+          <div className="text-3xl mb-3">{stat.icon}</div>
+          <div className={`text-3xl font-bold ${stat.color} mb-2`}>
+            {stat.value}
+          </div>
+          <div className="text-sm font-semibold text-gray-900 mb-1">
+            {stat.label}
+          </div>
+          <div className="text-xs text-gray-600">
+            {stat.description}
+          </div>
         </div>
-        <div className="text-sm text-gray-600">Highest Score</div>
-      </div>
-      <div className="bg-white rounded-lg shadow p-4 text-center">
-        <div className="text-2xl font-bold text-green-600">
-          {matchSummary.teamStats.reduce((sum, t) => sum + t.boundaries, 0)}
-        </div>
-        <div className="text-sm text-gray-600">Total Boundaries</div>
-      </div>
-      <div className="bg-white rounded-lg shadow p-4 text-center">
-        <div className="text-2xl font-bold text-purple-600">
-          {matchSummary.teamStats.reduce((sum, t) => sum + t.sixes, 0)}
-        </div>
-        <div className="text-sm text-gray-600">Total Sixes</div>
-      </div>
-      <div className="bg-white rounded-lg shadow p-4 text-center">
-        <div className="text-2xl font-bold text-red-600">
-          {matchSummary.teamStats.reduce((sum, t) => sum + t.totalWickets, 0)}
-        </div>
-        <div className="text-sm text-gray-600">Total Wickets</div>
-      </div>
+      ))}
     </div>
   );
 }; 

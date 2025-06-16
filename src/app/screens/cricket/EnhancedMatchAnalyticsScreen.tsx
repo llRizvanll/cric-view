@@ -259,26 +259,26 @@ export const EnhancedMatchAnalyticsScreen: React.FC<EnhancedMatchAnalyticsScreen
               <div className="space-y-8">
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">Match Overview</h2>
-                  <p className="text-gray-600">Key statistics and team comparison</p>
+                  <p className="text-gray-600">Comprehensive match analysis and team comparison</p>
                 </div>
                 
-                <div className="space-y-6">
-                  {matchSummary.teamStats.length >= 2 && (
+                {/* Team Comparison Section */}
+                {matchSummary.teamStats.length >= 2 && (
+                  <section>
                     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                       <StatsComparison teamStats={matchSummary.teamStats} />
                     </div>
-                  )}
-                  
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-                    <OverviewTabContent 
-                      matchData={matchData}
-                      matchSummary={matchSummary}
-                      topBatsmen={topBatsmen}
-                      topBowlers={topBowlers}
-                      generateManhattanData={generateManhattanData}
-                    />
-                  </div>
-                </div>
+                  </section>
+                )}
+                
+                {/* Overview Content */}
+                <OverviewTabContent 
+                  matchData={matchData}
+                  matchSummary={matchSummary}
+                  topBatsmen={topBatsmen}
+                  topBowlers={topBowlers}
+                  generateManhattanData={generateManhattanData}
+                />
               </div>
             )}
 
