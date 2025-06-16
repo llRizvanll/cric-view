@@ -12,9 +12,12 @@ export const BowlingTabContent: React.FC<BowlingTabContentProps> = ({ topBowlers
   return (
     <>
       {/* Top Bowlers Grid */}
-      <div>
-        <h3 className="text-xl font-semibold mb-4">Bowling Figures</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="mb-4">
+        <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-1.5">
+          <span>⚾</span>
+          Bowling Figures
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
           {topBowlers.map((player, index) => (
             <PlayerCard 
               key={player.name} 
@@ -27,7 +30,7 @@ export const BowlingTabContent: React.FC<BowlingTabContentProps> = ({ topBowlers
       </div>
 
       {/* Bowling Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <BarChart
           data={topBowlers.slice(0, 8).map(player => ({
             name: player.name.split(' ').pop() || player.name,

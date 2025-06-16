@@ -12,9 +12,12 @@ export const StatsComparison: React.FC<StatsComparisonProps> = ({
 }) => {
   if (!teamStats || teamStats.length < 2) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-4">{title}</h3>
-        <p className="text-gray-500">Insufficient data for comparison</p>
+      <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-xl p-3">
+        <h3 className="text-base font-semibold text-white mb-1.5 flex items-center gap-1.5">
+          <span>⚖️</span>
+          {title}
+        </h3>
+        <p className="text-gray-400 text-xs">Insufficient data for comparison</p>
       </div>
     );
   }
@@ -27,67 +30,129 @@ export const StatsComparison: React.FC<StatsComparisonProps> = ({
     value1, 
     value2, 
     unit = '',
-    higherIsBetter = true 
+    higherIsBetter = true,
+    icon = '📊'
   }: {
     label: string;
     value1: number;
     value2: number;
     unit?: string;
     higherIsBetter?: boolean;
+    icon?: string;
   }) => {
     const team1Better = higherIsBetter ? value1 > value2 : value1 < value2;
     const team2Better = higherIsBetter ? value2 > value1 : value2 < value1;
+    const maxValue = Math.max(value1, value2);
+    const team1Percentage = maxValue > 0 ? (value1 / maxValue) * 100 : 0;
+    const team2Percentage = maxValue > 0 ? (value2 / maxValue) * 100 : 0;
     
     return (
-      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-        <div className="text-center flex-1">
-          <div className={`text-lg font-bold ${team1Better ? 'text-green-600' : team2Better ? 'text-red-600' : 'text-gray-700'}`}>
-            {value1}{unit}
-          </div>
-          <div className="text-xs text-gray-600">{team1.team}</div>
+      <div className="bg-gray-700/30 rounded-lg p-2">
+        {/* Header */}
+        <div className="flex items-center justify-center gap-1.5 mb-2">
+          <span className="text-xs">{icon}</span>
+          <div className="text-white font-medium text-xs">{label}</div>
         </div>
         
-        <div className="text-center px-4">
-          <div className="text-sm font-semibold text-gray-700">{label}</div>
-        </div>
-        
-        <div className="text-center flex-1">
-          <div className={`text-lg font-bold ${team2Better ? 'text-green-600' : team1Better ? 'text-red-600' : 'text-gray-700'}`}>
-            {value2}{unit}
+        {/* Team Comparison */}
+        <div className="grid grid-cols-3 items-center gap-2">
+          {/* Team 1 */}
+          <div className="text-center">
+            <div className={`text-sm font-bold ${
+              team1Better ? 'text-green-300' : 
+              team2Better ? 'text-red-300' : 
+              'text-white'
+            }`}>
+              {value1}{unit}
+            </div>
+            <div className="text-gray-400 text-xs truncate">{team1.team}</div>
+            
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-600/30 rounded-full h-1 mt-1 overflow-hidden">
+              <div 
+                className={`h-full rounded-full transition-all duration-500 ${
+                  team1Better ? 'bg-green-400' :
+                  team2Better ? 'bg-red-400' :
+                  'bg-blue-400'
+                }`}
+                style={{ width: `${team1Percentage}%` }}
+              ></div>
+            </div>
           </div>
-          <div className="text-xs text-gray-600">{team2.team}</div>
+          
+          {/* VS Indicator */}
+          <div className="text-center">
+            <div className="w-6 h-6 mx-auto bg-gray-600/30 rounded-full flex items-center justify-center">
+              <span className="text-gray-400 font-bold text-xs">VS</span>
+            </div>
+          </div>
+          
+          {/* Team 2 */}
+          <div className="text-center">
+            <div className={`text-sm font-bold ${
+              team2Better ? 'text-green-300' : 
+              team1Better ? 'text-red-300' : 
+              'text-white'
+            }`}>
+              {value2}{unit}
+            </div>
+            <div className="text-gray-400 text-xs truncate">{team2.team}</div>
+            
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-600/30 rounded-full h-1 mt-1 overflow-hidden">
+              <div 
+                className={`h-full rounded-full transition-all duration-500 ${
+                  team2Better ? 'bg-green-400' :
+                  team1Better ? 'bg-red-400' :
+                  'bg-purple-400'
+                }`}
+                style={{ width: `${team2Percentage}%` }}
+              ></div>
+            </div>
+          </div>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h3 className="text-xl font-semibold mb-6 text-center">{title}</h3>
+    <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-xl p-3">
+      {/* Header */}
+      <div className="text-center mb-3">
+        <h3 className="text-base font-bold text-white mb-0.5 flex items-center justify-center gap-1.5">
+          <span>⚖️</span>
+          {title}
+        </h3>
+        <div className="text-gray-400 text-xs">Head-to-head analysis</div>
+      </div>
       
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
         <ComparisonItem
           label="Total Runs"
           value1={team1.totalRuns}
           value2={team2.totalRuns}
+          icon="🏃"
         />
         
         <ComparisonItem
           label="Run Rate"
           value1={Number(team1.runRate.toFixed(2))}
           value2={Number(team2.runRate.toFixed(2))}
+          icon="⚡"
         />
         
         <ComparisonItem
           label="Boundaries"
           value1={team1.boundaries}
           value2={team2.boundaries}
+          icon="🎯"
         />
         
         <ComparisonItem
           label="Sixes"
           value1={team1.sixes}
           value2={team2.sixes}
+          icon="🚀"
         />
         
         <ComparisonItem
@@ -95,27 +160,40 @@ export const StatsComparison: React.FC<StatsComparisonProps> = ({
           value1={team1.totalWickets}
           value2={team2.totalWickets}
           higherIsBetter={false}
+          icon="📉"
         />
         
         <ComparisonItem
           label="Overs Played"
           value1={Number(team1.totalOvers.toFixed(1))}
           value2={Number(team2.totalOvers.toFixed(1))}
+          icon="⏱️"
         />
       </div>
       
       {/* Winner Highlight */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+      <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-2">
         <div className="text-center">
-          <div className="text-sm text-blue-600 font-medium">Higher Scorer</div>
-          <div className="text-lg font-bold text-blue-700">
+          <div className="flex items-center justify-center gap-1.5 mb-0.5">
+            <span className="text-sm">🏆</span>
+            <div className="text-blue-300 font-semibold text-xs">Higher Scorer</div>
+          </div>
+          
+          <div className="text-lg font-bold text-white mb-0.5">
             {team1.totalRuns > team2.totalRuns ? team1.team : 
              team2.totalRuns > team1.totalRuns ? team2.team : 
-             'Tie'}
+             'Perfect Tie!'}
           </div>
+          
           {team1.totalRuns !== team2.totalRuns && (
-            <div className="text-sm text-blue-600">
-              by {Math.abs(team1.totalRuns - team2.totalRuns)} runs
+            <div className="text-blue-300 text-xs">
+              Victory margin: {Math.abs(team1.totalRuns - team2.totalRuns)} runs
+            </div>
+          )}
+          
+          {team1.totalRuns === team2.totalRuns && (
+            <div className="text-yellow-300 text-xs">
+              Exact same score!
             </div>
           )}
         </div>

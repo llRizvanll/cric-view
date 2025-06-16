@@ -115,20 +115,20 @@ export const PlayersStatsGrid: React.FC<PlayersStatsGridProps> = ({ match, viewM
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-xl p-3">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
-        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-          <span className="mr-2">👥</span>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 space-y-2 md:space-y-0">
+        <h2 className="text-base font-bold text-white flex items-center">
+          <span className="mr-1.5">👥</span>
           Players Statistics
         </h2>
         
-        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
+        <div className="flex flex-col md:flex-row space-y-1.5 md:space-y-0 md:space-x-2">
           {/* Team Filter */}
           <select
             value={selectedTeam}
             onChange={(e) => setSelectedTeam(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-2 py-1 text-xs border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="all">All Teams</option>
             {teams.map(team => (
@@ -140,7 +140,7 @@ export const PlayersStatsGrid: React.FC<PlayersStatsGridProps> = ({ match, viewM
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-2 py-1 text-xs border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="runs">Sort by Runs</option>
             <option value="wickets">Sort by Wickets</option>
@@ -151,53 +151,53 @@ export const PlayersStatsGrid: React.FC<PlayersStatsGridProps> = ({ match, viewM
       </div>
 
       {/* Players Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-3">
         {sortedPlayers.map((player, index) => (
           <div 
             key={`${player.name}-${player.team}`}
-            className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-gradient-to-br from-white to-gray-50"
+            className="border border-gray-600/50 rounded-lg p-2 hover:border-gray-500/50 transition-all bg-gray-700/30"
           >
             {/* Player Header */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-2">
-                <span className="text-lg">{getPlayerStatusIcon(player)}</span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center space-x-1.5">
+                <span className="text-sm">{getPlayerStatusIcon(player)}</span>
                 <div>
-                  <h3 className="font-semibold text-gray-800 text-sm">{player.name}</h3>
-                  <p className="text-xs text-gray-500">{player.team}</p>
+                  <h3 className="font-medium text-white text-xs">{player.name}</h3>
+                  <p className="text-xs text-gray-400">{player.team}</p>
                 </div>
               </div>
-              <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+              <div className="text-xs bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded-md">
                 #{index + 1}
               </div>
             </div>
 
             {/* Batting Stats */}
             {player.batting && (
-              <div className="mb-3 p-3 bg-green-50 rounded-lg">
-                <h4 className="text-xs font-semibold text-green-800 mb-2 flex items-center">
+              <div className="mb-2 p-2 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <h4 className="text-xs font-medium text-green-300 mb-1.5 flex items-center">
                   <span className="mr-1">🏏</span>
                   Batting
                 </h4>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <span className="text-gray-600">Runs:</span>
-                    <span className="ml-1 font-bold text-green-700">{player.batting.runs}</span>
+                <div className="grid grid-cols-2 gap-1.5 text-xs">
+                  <div className="bg-gray-800/30 rounded-md p-1">
+                    <span className="text-gray-400">Runs:</span>
+                    <span className="ml-1 font-medium text-green-300">{player.batting.runs}</span>
                   </div>
-                  <div>
-                    <span className="text-gray-600">Balls:</span>
-                    <span className="ml-1 font-bold">{player.batting.balls}</span>
+                  <div className="bg-gray-800/30 rounded-md p-1">
+                    <span className="text-gray-400">Balls:</span>
+                    <span className="ml-1 font-medium text-white">{player.batting.balls}</span>
                   </div>
-                  <div>
-                    <span className="text-gray-600">4s:</span>
-                    <span className="ml-1 font-bold text-blue-600">{player.batting.boundaries}</span>
+                  <div className="bg-gray-800/30 rounded-md p-1">
+                    <span className="text-gray-400">4s:</span>
+                    <span className="ml-1 font-medium text-blue-300">{player.batting.boundaries}</span>
                   </div>
-                  <div>
-                    <span className="text-gray-600">6s:</span>
-                    <span className="ml-1 font-bold text-purple-600">{player.batting.sixes}</span>
+                  <div className="bg-gray-800/30 rounded-md p-1">
+                    <span className="text-gray-400">6s:</span>
+                    <span className="ml-1 font-medium text-purple-300">{player.batting.sixes}</span>
                   </div>
-                  <div className="col-span-2">
-                    <span className="text-gray-600">Strike Rate:</span>
-                    <span className="ml-1 font-bold text-orange-600">
+                  <div className="col-span-2 bg-gray-800/30 rounded-md p-1">
+                    <span className="text-gray-400">Strike Rate:</span>
+                    <span className="ml-1 font-medium text-orange-300">
                       {player.batting.strikeRate.toFixed(1)}
                     </span>
                   </div>
@@ -207,27 +207,27 @@ export const PlayersStatsGrid: React.FC<PlayersStatsGridProps> = ({ match, viewM
 
             {/* Bowling Stats */}
             {player.bowling && (
-              <div className="p-3 bg-red-50 rounded-lg">
-                <h4 className="text-xs font-semibold text-red-800 mb-2 flex items-center">
+              <div className="p-2 bg-red-500/10 border border-red-500/20 rounded-lg">
+                <h4 className="text-xs font-medium text-red-300 mb-1.5 flex items-center">
                   <span className="mr-1">⚾</span>
                   Bowling
                 </h4>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <span className="text-gray-600">Overs:</span>
-                    <span className="ml-1 font-bold">{player.bowling.overs}</span>
+                <div className="grid grid-cols-2 gap-1.5 text-xs">
+                  <div className="bg-gray-800/30 rounded-md p-1">
+                    <span className="text-gray-400">Overs:</span>
+                    <span className="ml-1 font-medium text-white">{player.bowling.overs}</span>
                   </div>
-                  <div>
-                    <span className="text-gray-600">Wickets:</span>
-                    <span className="ml-1 font-bold text-red-700">{player.bowling.wickets}</span>
+                  <div className="bg-gray-800/30 rounded-md p-1">
+                    <span className="text-gray-400">Wickets:</span>
+                    <span className="ml-1 font-medium text-red-300">{player.bowling.wickets}</span>
                   </div>
-                  <div>
-                    <span className="text-gray-600">Runs:</span>
-                    <span className="ml-1 font-bold">{player.bowling.runs}</span>
+                  <div className="bg-gray-800/30 rounded-md p-1">
+                    <span className="text-gray-400">Runs:</span>
+                    <span className="ml-1 font-medium text-white">{player.bowling.runs}</span>
                   </div>
-                  <div>
-                    <span className="text-gray-600">Economy:</span>
-                    <span className="ml-1 font-bold text-yellow-600">
+                  <div className="bg-gray-800/30 rounded-md p-1">
+                    <span className="text-gray-400">Economy:</span>
+                    <span className="ml-1 font-medium text-yellow-300">
                       {player.bowling.economy.toFixed(1)}
                     </span>
                   </div>
@@ -237,7 +237,7 @@ export const PlayersStatsGrid: React.FC<PlayersStatsGridProps> = ({ match, viewM
 
             {/* No stats available */}
             {!player.batting && !player.bowling && (
-              <div className="text-center text-gray-500 text-sm py-4">
+              <div className="text-center text-gray-500 text-xs py-2">
                 No statistics available
               </div>
             )}
@@ -246,29 +246,29 @@ export const PlayersStatsGrid: React.FC<PlayersStatsGridProps> = ({ match, viewM
       </div>
 
       {/* Summary */}
-      <div className="mt-6 pt-4 border-t border-gray-200">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div className="bg-blue-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-blue-600">{filteredPlayers.length}</div>
-            <div className="text-xs text-gray-600">Total Players</div>
+      <div className="pt-2 border-t border-gray-600/50">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-2">
+            <div className="text-lg font-bold text-blue-300">{filteredPlayers.length}</div>
+            <div className="text-xs text-gray-400">Total</div>
           </div>
-          <div className="bg-green-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-green-600">
+          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-2">
+            <div className="text-lg font-bold text-green-300">
               {filteredPlayers.filter(p => p.batting).length}
             </div>
-            <div className="text-xs text-gray-600">Batsmen</div>
+            <div className="text-xs text-gray-400">Batsmen</div>
           </div>
-          <div className="bg-red-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-red-600">
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-2">
+            <div className="text-lg font-bold text-red-300">
               {filteredPlayers.filter(p => p.bowling).length}
             </div>
-            <div className="text-xs text-gray-600">Bowlers</div>
+            <div className="text-xs text-gray-400">Bowlers</div>
           </div>
-          <div className="bg-purple-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-purple-600">
+          <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-2">
+            <div className="text-lg font-bold text-purple-300">
               {filteredPlayers.filter(p => p.batting && p.bowling).length}
             </div>
-            <div className="text-xs text-gray-600">All-rounders</div>
+            <div className="text-xs text-gray-400">All-rounders</div>
           </div>
         </div>
       </div>

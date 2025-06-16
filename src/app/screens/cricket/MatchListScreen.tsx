@@ -86,53 +86,43 @@ const MatchCard = React.memo(({ match }: { match: CricketMatch }) => {
   return (
     <Link 
       href={`/analytics/${match.matchId}`}
-      className="group block relative bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-transparent hover:-translate-y-1 overflow-hidden"
+      className="group block relative bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 hover:border-gray-200 overflow-hidden"
     >
-      {/* Background gradient overlay for modern look */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      
       {/* Header Section */}
-      <div className="relative p-6 pb-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
-              <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+      <div className="relative p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-1 bg-blue-500 text-white text-xs font-medium px-2 py-0.5 rounded-md">
+              <span className="w-1 h-1 bg-white rounded-full"></span>
               {match.info.match_type || 'Unknown'}
             </span>
             {match.info.team_type === 'international' && (
-              <span className="inline-flex items-center bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-sm">
-                🌍 International
+              <span className="inline-flex items-center bg-amber-500 text-white text-xs font-medium px-1.5 py-0.5 rounded-md">
+                🌍
               </span>
             )}
           </div>
           {match.info.dates?.[0] && (
-            <div className="text-right">
-              <div className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-lg">
-                {formatDate(match.info.dates[0])}
-              </div>
+            <div className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
+              {formatDate(match.info.dates[0])}
             </div>
           )}
         </div>
         
-        {/* Enhanced Country Names - Premium Display */}
+        {/* Teams Display */}
         {match.info.teams && (
-          <div className="mb-4">
-            <div className="flex items-center gap-4">
+          <div className="mb-2">
+            <div className="flex items-center gap-2">
               {Array.isArray(match.info.teams) ? (
                 <>
                   {/* Team 1 */}
-                  <div className="flex-1 group/team">
-                    <div className="relative bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-100 rounded-xl p-4 transition-all duration-200 group-hover/team:border-emerald-300 group-hover/team:shadow-md">
-                      <div className="flex items-center gap-3">
-                        <div className="text-2xl group-hover/team:scale-110 transition-transform duration-200">
-                          {getCountryFlag(match.info.teams[0])}
-                        </div>
+                  <div className="flex-1">
+                    <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-2">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm">{getCountryFlag(match.info.teams[0])}</span>
                         <div className="min-w-0 flex-1">
-                          <div className="font-bold text-emerald-800 text-base truncate">
+                          <div className="font-medium text-emerald-800 text-xs truncate">
                             {match.info.teams[0]}
-                          </div>
-                          <div className="text-xs text-emerald-600 font-medium">
-                            Home Team
                           </div>
                         </div>
                       </div>
@@ -140,28 +130,20 @@ const MatchCard = React.memo(({ match }: { match: CricketMatch }) => {
                   </div>
                   
                   {/* VS Indicator */}
-                  <div className="flex-shrink-0 relative">
-                    <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center border-2 border-white shadow-lg group-hover:scale-110 transition-transform duration-200">
-                      <span className="text-xs font-black text-gray-600">VS</span>
-                    </div>
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-400 rounded-full flex items-center justify-center">
-                      <span className="text-xs">⚡</span>
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center border border-gray-200">
+                      <span className="text-xs font-bold text-gray-600">VS</span>
                     </div>
                   </div>
                   
                   {/* Team 2 */}
-                  <div className="flex-1 group/team">
-                    <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-100 rounded-xl p-4 transition-all duration-200 group-hover/team:border-blue-300 group-hover/team:shadow-md">
-                      <div className="flex items-center gap-3">
-                        <div className="text-2xl group-hover/team:scale-110 transition-transform duration-200">
-                          {getCountryFlag(match.info.teams[1])}
-                        </div>
+                  <div className="flex-1">
+                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-2">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm">{getCountryFlag(match.info.teams[1])}</span>
                         <div className="min-w-0 flex-1">
-                          <div className="font-bold text-blue-800 text-base truncate">
+                          <div className="font-medium text-blue-800 text-xs truncate">
                             {match.info.teams[1]}
-                          </div>
-                          <div className="text-xs text-blue-600 font-medium">
-                            Away Team
                           </div>
                         </div>
                       </div>
@@ -170,8 +152,8 @@ const MatchCard = React.memo(({ match }: { match: CricketMatch }) => {
                 </>
               ) : (
                 <div className="w-full flex items-center justify-center">
-                  <span className="font-medium text-gray-500 bg-gradient-to-r from-gray-100 to-gray-200 px-6 py-3 rounded-xl border border-gray-300">
-                    🏏 Teams To Be Announced
+                  <span className="text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 text-xs">
+                    🏏 Teams TBA
                   </span>
                 </div>
               )}
@@ -181,53 +163,42 @@ const MatchCard = React.memo(({ match }: { match: CricketMatch }) => {
       </div>
       
       {/* Match Details Section */}
-      <div className="relative px-6 pb-4">
-        <div className="grid grid-cols-1 gap-3">
+      <div className="px-3 pb-2">
+        <div className="grid grid-cols-1 gap-1.5">
           {match.info.venue && (
-            <div className="flex items-center gap-3 group/venue">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center group-hover/venue:scale-110 transition-transform duration-200">
-                <span className="text-sm">📍</span>
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 bg-purple-100 rounded-md flex items-center justify-center">
+                <span className="text-xs">📍</span>
               </div>
               <div className="min-w-0 flex-1">
-                <div className="font-medium text-gray-800 text-sm truncate">
-                  {match.info.venue}
+                <div className="text-gray-800 text-xs truncate">
+                  {match.info.venue}{match.info.city && `, ${match.info.city}`}
                 </div>
-                {match.info.city && (
-                  <div className="text-xs text-gray-500">
-                    {match.info.city}
-                  </div>
-                )}
               </div>
             </div>
           )}
           
           {match.info.event && (
-            <div className="flex items-center gap-3 group/event">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-100 to-orange-200 rounded-lg flex items-center justify-center group-hover/event:scale-110 transition-transform duration-200">
-                <span className="text-sm">🏆</span>
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 bg-amber-100 rounded-md flex items-center justify-center">
+                <span className="text-xs">🏆</span>
               </div>
               <div className="min-w-0 flex-1">
-                <div className="font-medium text-gray-800 text-sm truncate">
+                <div className="text-gray-800 text-xs truncate">
                   {typeof match.info.event === 'string' ? match.info.event : match.info.event?.name || 'Event'}
-                </div>
-                <div className="text-xs text-gray-500">
-                  Tournament
                 </div>
               </div>
             </div>
           )}
           
           {match.info.season && (
-            <div className="flex items-center gap-3 group/season">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-emerald-200 rounded-lg flex items-center justify-center group-hover/season:scale-110 transition-transform duration-200">
-                <span className="text-sm">📅</span>
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 bg-green-100 rounded-md flex items-center justify-center">
+                <span className="text-xs">📅</span>
               </div>
               <div className="min-w-0 flex-1">
-                <div className="font-medium text-gray-800 text-sm">
-                  {match.info.season}
-                </div>
-                <div className="text-xs text-gray-500">
-                  Season
+                <div className="text-gray-800 text-xs">
+                  Season {match.info.season}
                 </div>
               </div>
             </div>
@@ -236,42 +207,42 @@ const MatchCard = React.memo(({ match }: { match: CricketMatch }) => {
       </div>
       
       {/* Result/Footer Section */}
-      <div className="relative mt-2 px-6 pb-6">
-        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200">
+      <div className="px-3 pb-3">
+        <div className="bg-gray-50 rounded-lg p-2 border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 {outcome?.winner ? (
                   <>
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="font-bold text-green-700 text-sm">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <span className="font-medium text-green-700 text-xs">
                       🎉 {outcome.winner} Won
                     </span>
                   </>
                 ) : (
                   <>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                    <span className="font-medium text-gray-600 text-sm">
+                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                    <span className="text-gray-600 text-xs">
                       {outcome?.result || 'No Result'}
                     </span>
                   </>
                 )}
               </div>
               {match.info.player_of_match && (
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-1 rounded-full border border-amber-200">
-                    ⭐ Player of the Match
+                <div className="mt-1 flex items-center gap-1.5">
+                  <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200">
+                    ⭐ POTM
                   </span>
-                  <span className="text-xs text-gray-700 font-medium truncate">
+                  <span className="text-xs text-gray-700 truncate">
                     {Array.isArray(match.info.player_of_match) ? 
                       match.info.player_of_match.join(', ') : match.info.player_of_match}
                   </span>
                 </div>
               )}
             </div>
-            <div className="flex-shrink-0 ml-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
-                <span className="text-white text-lg">📊</span>
+            <div className="flex-shrink-0 ml-2">
+              <div className="w-6 h-6 bg-blue-500 rounded-md flex items-center justify-center">
+                <span className="text-white text-xs">📊</span>
               </div>
             </div>
           </div>
@@ -286,42 +257,42 @@ const MatchCard = React.memo(({ match }: { match: CricketMatch }) => {
 
 MatchCard.displayName = 'MatchCard';
 
-// Enhanced loading skeleton component
+// Clean loading skeleton component
 const LoadingSkeleton = React.memo(() => (
   <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
     {/* Header skeleton */}
     <div className="p-6 pb-4">
       <div className="flex justify-between items-center mb-4">
         <div className="flex gap-2">
-          <div className="h-7 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-20"></div>
-          <div className="h-7 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-24"></div>
+          <div className="h-6 bg-gray-200 rounded-lg w-16"></div>
+          <div className="h-6 bg-gray-200 rounded-lg w-20"></div>
         </div>
-        <div className="h-6 bg-gray-200 rounded-lg w-16"></div>
+        <div className="h-5 bg-gray-200 rounded-lg w-12"></div>
       </div>
       
       {/* Teams skeleton */}
       <div className="flex items-center gap-4 mb-4">
         <div className="flex-1">
-          <div className="bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-200 rounded-xl p-4">
+          <div className="bg-gray-100 border border-gray-200 rounded-xl p-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+              <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
               <div className="flex-1">
-                <div className="h-4 bg-gray-300 rounded w-20 mb-1"></div>
-                <div className="h-3 bg-gray-200 rounded w-16"></div>
+                <div className="h-4 bg-gray-300 rounded w-16 mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded w-12"></div>
               </div>
             </div>
           </div>
         </div>
         
-        <div className="w-12 h-12 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full"></div>
+        <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
         
         <div className="flex-1">
-          <div className="bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-200 rounded-xl p-4">
+          <div className="bg-gray-100 border border-gray-200 rounded-xl p-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+              <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
               <div className="flex-1">
-                <div className="h-4 bg-gray-300 rounded w-20 mb-1"></div>
-                <div className="h-3 bg-gray-200 rounded w-16"></div>
+                <div className="h-4 bg-gray-300 rounded w-16 mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded w-12"></div>
               </div>
             </div>
           </div>
@@ -331,19 +302,19 @@ const LoadingSkeleton = React.memo(() => (
     
     {/* Details skeleton */}
     <div className="px-6 pb-4">
-      <div className="space-y-3">
+      <div className="space-y-2">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+          <div className="w-6 h-6 bg-gray-200 rounded-lg"></div>
           <div className="flex-1">
-            <div className="h-4 bg-gray-200 rounded w-32 mb-1"></div>
-            <div className="h-3 bg-gray-200 rounded w-20"></div>
+            <div className="h-3 bg-gray-200 rounded w-24 mb-1"></div>
+            <div className="h-2 bg-gray-200 rounded w-16"></div>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+          <div className="w-6 h-6 bg-gray-200 rounded-lg"></div>
           <div className="flex-1">
-            <div className="h-4 bg-gray-200 rounded w-28 mb-1"></div>
-            <div className="h-3 bg-gray-200 rounded w-16"></div>
+            <div className="h-3 bg-gray-200 rounded w-20 mb-1"></div>
+            <div className="h-2 bg-gray-200 rounded w-12"></div>
           </div>
         </div>
       </div>
@@ -351,13 +322,13 @@ const LoadingSkeleton = React.memo(() => (
     
     {/* Footer skeleton */}
     <div className="px-6 pb-6 mt-2">
-      <div className="bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl p-4">
+      <div className="bg-gray-100 rounded-xl p-3">
         <div className="flex justify-between items-center">
           <div className="flex-1">
-            <div className="h-4 bg-gray-300 rounded w-24 mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-32"></div>
+            <div className="h-3 bg-gray-300 rounded w-20 mb-1"></div>
+            <div className="h-2 bg-gray-200 rounded w-24"></div>
           </div>
-          <div className="w-10 h-10 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full"></div>
+          <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
         </div>
       </div>
     </div>
@@ -482,63 +453,75 @@ export const MatchListScreen: React.FC = () => {
 
   // Memoized filter buttons to prevent unnecessary re-renders
   const filterButtons = useMemo(() => (
-    <div className="flex gap-2 mb-6 flex-wrap">
-      <button
-        onClick={() => handleFilterChange('all')}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-          filter === 'all'
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-        }`}
-      >
-        All ({totalCount})
-      </button>
-      {availableMatchTypes.map(type => (
+    <div className="bg-gray-50 rounded-xl p-2 mb-4">
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <span className="text-xs">🏏</span>
+        <span className="text-xs font-semibold text-gray-700">Match Type</span>
+      </div>
+      <div className="flex gap-1.5 flex-wrap">
         <button
-          key={type}
-          onClick={() => handleFilterChange(type)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            filter === type
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          onClick={() => handleFilterChange('all')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+            filter === 'all'
+              ? 'bg-blue-500 text-white shadow-sm'
+              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
           }`}
         >
-          {type}
+          All ({totalCount})
         </button>
-      ))}
+        {availableMatchTypes.map(type => (
+          <button
+            key={type}
+            onClick={() => handleFilterChange(type)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+              filter === type
+                ? 'bg-blue-500 text-white shadow-sm'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            {type}
+          </button>
+        ))}
+      </div>
     </div>
   ), [filter, totalCount, availableMatchTypes, handleFilterChange]);
 
   const yearButtons = useMemo(() => (
-    <div className="flex gap-2 mb-6 flex-wrap">
-      <button
-        onClick={() => handleYearChange('all')}
-        className={`px-3 py-1 rounded text-sm transition-colors ${
-          yearFilter === 'all'
-            ? 'bg-green-600 text-white'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-        }`}
-      >
-        All Years
-      </button>
-      {availableYears.slice(0, 10).map(year => (
+    <div className="bg-gray-50 rounded-xl p-2 mb-4">
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <span className="text-xs">📅</span>
+        <span className="text-xs font-semibold text-gray-700">Year</span>
+      </div>
+      <div className="flex gap-1.5 flex-wrap">
         <button
-          key={year}
-          onClick={() => handleYearChange(year)}
-          className={`px-3 py-1 rounded text-sm transition-colors ${
-            yearFilter === year
-              ? 'bg-green-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          onClick={() => handleYearChange('all')}
+          className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+            yearFilter === 'all'
+              ? 'bg-green-500 text-white shadow-sm'
+              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
           }`}
         >
-          {year}
+          All Years
         </button>
-      ))}
-      {availableYears.length > 10 && (
-        <span className="px-3 py-1 text-sm text-gray-500">
-          +{availableYears.length - 10} more
-        </span>
-      )}
+        {availableYears.slice(0, 8).map(year => (
+          <button
+            key={year}
+            onClick={() => handleYearChange(year)}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+              yearFilter === year
+                ? 'bg-green-500 text-white shadow-sm'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            {year}
+          </button>
+        ))}
+        {availableYears.length > 8 && (
+          <span className="px-2.5 py-1 text-xs text-gray-500 bg-gray-100 rounded-md">
+            +{availableYears.length - 8} more
+          </span>
+        )}
+      </div>
     </div>
   ), [yearFilter, availableYears, handleYearChange]);
 
@@ -558,33 +541,51 @@ export const MatchListScreen: React.FC = () => {
 
   if (loading && allMatches.length === 0) {
     return (
-      <div className="container mx-auto p-4">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Cricket Matches</h1>
-          <div className="text-sm text-gray-600 animate-pulse">Loading optimized data...</div>
-        </div>
-
-        {/* Loading skeleton for filter buttons */}
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {Array.from({ length: 5 }, (_, i) => (
-            <div key={i} className="animate-pulse bg-gray-200 h-10 w-20 rounded-lg"></div>
-          ))}
-        </div>
-
-        <div className="text-center mb-4">
-          <div className="text-sm text-blue-600 font-medium">
-            🚀 Building optimized index for faster loading...
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-6 max-w-7xl">
+          <div className="mb-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+                    <span className="text-xl">🏏</span>
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Cricket Matches</h1>
+                    <p className="text-gray-600 text-sm">Loading data...</p>
+                  </div>
+                </div>
+                <div className="animate-pulse">
+                  <div className="bg-gray-200 rounded-xl px-4 py-3 w-20 h-16"></div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="text-xs text-gray-500 mt-1">
-            This may take a moment on first load, then it will be much faster!
-          </div>
-        </div>
 
-        {/* Loading skeleton for match cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }, (_, i) => (
-            <LoadingSkeleton key={i} />
-          ))}
+          {/* Loading skeleton for filter buttons */}
+          <div className="bg-gray-50 rounded-2xl p-3 mb-6">
+            <div className="flex gap-2 flex-wrap">
+              {Array.from({ length: 5 }, (_, i) => (
+                <div key={i} className="animate-pulse bg-gray-200 h-10 w-20 rounded-xl"></div>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-center mb-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <div className="text-sm text-blue-700 font-medium">
+              🚀 Building optimized index...
+            </div>
+            <div className="text-xs text-blue-600 mt-1">
+              This may take a moment on first load
+            </div>
+          </div>
+
+          {/* Loading skeleton for match cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }, (_, i) => (
+              <LoadingSkeleton key={i} />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -592,13 +593,14 @@ export const MatchListScreen: React.FC = () => {
 
   if (error && allMatches.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center max-w-md">
-          <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Matches</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-md bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <div className="text-4xl mb-4">⚠️</div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Error Loading Matches</h2>
+          <p className="text-gray-600 text-sm mb-6">{error}</p>
           <button
             onClick={() => loadMatches(1, filter, yearFilter, false)}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200"
           >
             Try Again
           </button>
@@ -610,75 +612,71 @@ export const MatchListScreen: React.FC = () => {
   const remainingCount = totalCount - allMatches.length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
-      <div className="container mx-auto p-4 md:p-6">
-        {/* Enhanced Header */}
-        <div className="mb-8">
-          <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 overflow-hidden">
-            {/* Background decoration */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full -translate-y-32 translate-x-32"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-emerald-400/10 to-teal-400/10 rounded-full translate-y-24 -translate-x-24"></div>
-            
-            <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-3 py-4 max-w-7xl">
+        {/* Minimal Header */}
+        <div className="mb-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                    <span className="text-2xl">🏏</span>
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                    <span className="text-lg">🏏</span>
                   </div>
                   <div>
-                    <h1 className="text-4xl font-black bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    <h1 className="text-xl font-bold text-gray-900">
                       Cricket Matches
                     </h1>
-                    <p className="text-gray-600 font-medium">
-                      International cricket with live analytics
+                    <p className="text-gray-600 text-xs">
+                      International cricket with analytics
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 mt-4">
-                  <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-xs font-semibold text-emerald-700">Live Updates</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-md border border-green-200">
+                    <div className="w-1 h-1 bg-green-500 rounded-full"></div>
+                    <span className="text-xs font-medium text-green-700">Live</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-200">
+                  <div className="flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
                     <span className="text-xs">🌍</span>
-                    <span className="text-xs font-semibold text-blue-700">Global Coverage</span>
+                    <span className="text-xs font-medium text-blue-700">Global</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-purple-50 px-3 py-1.5 rounded-full border border-purple-200">
+                  <div className="flex items-center gap-1 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">
                     <span className="text-xs">📊</span>
-                    <span className="text-xs font-semibold text-purple-700">Enhanced Analytics</span>
+                    <span className="text-xs font-medium text-purple-700">Analytics</span>
                   </div>
                 </div>
               </div>
               
-              <div className="flex flex-col items-end gap-2">
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg border border-gray-200/50">
-                  <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <div className="text-right">
+                <div className="bg-gray-50 rounded-lg px-3 py-2 border border-gray-200">
+                  <div className="text-lg font-bold text-gray-900">
                     {allMatches.length}
                   </div>
-                  <div className="text-xs text-gray-600 font-medium">
-                    of {totalCount} matches
+                  <div className="text-xs text-gray-600">
+                    of {totalCount}
                   </div>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full"></div>
-                  <span>Updated in real-time</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Match type filters */}
+        {/* Filter Sections */}
         {filterButtons}
-
-        {/* Year filters */}
         {yearButtons}
 
-        <div className="text-center mb-4">
-          <div className="text-sm text-gray-600">
-            📊 Filter: <span className="font-medium">{filter}</span> | 
-            📅 Year: <span className="font-medium">{yearFilter}</span>
-            {(filter !== 'all' || yearFilter !== 'all') && (
+        {/* Current Filter Status */}
+        {(filter !== 'all' || yearFilter !== 'all') && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-2.5 mb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs text-blue-800">
+                <span>🔍</span>
+                <span>
+                  Showing <strong>{filter}</strong> matches
+                  {yearFilter !== 'all' && <> from <strong>{yearFilter}</strong></>}
+                </span>
+              </div>
               <button
                 onClick={() => {
                   setFilter('all');
@@ -688,48 +686,46 @@ export const MatchListScreen: React.FC = () => {
                   setHasMoreData(true);
                   loadMatches(1, 'all', 'all', false);
                 }}
-                className="ml-2 text-blue-600 hover:text-blue-800 text-xs underline"
+                className="text-blue-600 hover:text-blue-800 text-xs font-medium"
               >
-                Clear filters
+                Clear
               </button>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
         {allMatches.length === 0 && !loading ? (
-          <div className="text-center py-12">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No matches found</h3>
-            <p className="text-gray-600">Try adjusting your filters to see more results.</p>
+          <div className="text-center py-8 bg-white rounded-xl shadow-sm border border-gray-100">
+            <div className="text-3xl mb-2">🏏</div>
+            <h3 className="text-base font-semibold text-gray-900 mb-1">No matches found</h3>
+            <p className="text-gray-600 text-xs">Try adjusting your filters</p>
           </div>
         ) : (
           <>
             {matchGrid}
             
             {/* Load More / End Message */}
-            <div className="text-center mt-8">
+            <div className="text-center mt-6">
               {hasMoreData ? (
                 <button
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-200 shadow-sm text-sm"
                 >
                   {loadingMore ? (
                     <span className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       Loading...
                     </span>
                   ) : (
-                    `Load More Matches (${remainingCount} remaining)`
+                    `Load More (${remainingCount})`
                   )}
                 </button>
               ) : (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 inline-block">
-                  <div className="flex items-center gap-2 text-green-800">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 inline-block">
+                  <div className="flex items-center gap-1.5 text-green-800">
                     <span>✅</span>
-                    <span className="font-medium">All matches loaded!</span>
-                  </div>
-                  <div className="text-sm text-green-600 mt-1">
-                    You've seen all {totalCount} matches for the current filter.
+                    <span className="font-medium text-xs">All {totalCount} matches loaded</span>
                   </div>
                 </div>
               )}
