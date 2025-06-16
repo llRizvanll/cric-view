@@ -51,9 +51,9 @@ export const DetailedScorecard: React.FC<DetailedScorecardProps> = ({
   
   if (!match.innings || match.innings.length === 0) {
     return (
-      <div className="bg-gradient-to-br from-slate-800/60 to-slate-700/60 rounded-2xl border border-slate-700/50 p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Detailed Scorecard</h3>
-        <p className="text-slate-400">No innings data available</p>
+      <div className="bg-gray-50 rounded-2xl border border-gray-200 p-8">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">Match Scorecard</h3>
+        <p className="text-gray-600">No innings data available</p>
       </div>
     );
   }
@@ -240,44 +240,44 @@ export const DetailedScorecard: React.FC<DetailedScorecardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Innings Header */}
-      <div className="bg-gradient-to-r from-slate-800/95 to-slate-700/95 rounded-2xl border border-slate-700/50 overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600/30 to-emerald-600/30 p-6">
+      {/* Apple-style Innings Header */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-gray-50 px-6 py-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2">{innings.team}</h2>
-              <div className="flex items-center gap-4 text-slate-200">
-                <span className="text-sm">{selectedInnings + 1}{selectedInnings === 0 ? 'st' : 'nd'} Innings</span>
-                <span className="text-sm">•</span>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{innings.team}</h2>
+              <div className="flex items-center space-x-4 text-gray-600">
+                <span className="text-sm font-medium">{selectedInnings + 1}{selectedInnings === 0 ? 'st' : 'nd'} Innings</span>
+                <span className="text-gray-400">•</span>
                 <span className="text-sm">{match.info.venue}</span>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-4xl font-bold text-white">
+              <div className="text-4xl font-bold text-gray-900 mb-1">
                 {totalRuns}/{totalWickets}
               </div>
-              <div className="text-slate-200 text-lg">
+              <div className="text-gray-600">
                 ({overs}.{balls} overs, RR: {runRate.toFixed(2)})
               </div>
             </div>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="border-b border-slate-700/50 bg-slate-800/50">
+        {/* Apple-style Tab Navigation */}
+        <div className="border-b border-gray-200 bg-white">
           <div className="flex">
             {[
-              { key: 'batting', label: '🏏 Batting', icon: '🏏' },
-              { key: 'bowling', label: '⚾ Bowling', icon: '⚾' },
-              { key: 'fow', label: '📉 Fall of Wickets', icon: '📉' }
+              { key: 'batting', label: 'Batting', icon: '🏏' },
+              { key: 'bowling', label: 'Bowling', icon: '⚾' },
+              { key: 'fow', label: 'Fall of Wickets', icon: '📉' }
             ].map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors duration-200 border-b-2 ${
                   activeTab === tab.key
-                    ? 'text-blue-400 border-b-2 border-blue-400 bg-slate-700/50'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-700/30'
+                    ? 'text-blue-600 border-blue-600 bg-blue-50/50'
+                    : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
                 {isMobile ? tab.icon : tab.label}
@@ -289,54 +289,54 @@ export const DetailedScorecard: React.FC<DetailedScorecardProps> = ({
         {/* Tab Content */}
         <div className="p-6">
           {activeTab === 'batting' && (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* Batting Table */}
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full">
                   <thead>
-                    <tr className="border-b border-slate-700/50 text-slate-300">
-                      <th className="text-left p-3 font-medium">Batsman</th>
-                      {!isMobile && <th className="text-left p-3 font-medium">Dismissal</th>}
-                      <th className="text-right p-3 font-medium">R</th>
-                      <th className="text-right p-3 font-medium">B</th>
-                      <th className="text-right p-3 font-medium">4s</th>
-                      <th className="text-right p-3 font-medium">6s</th>
-                      <th className="text-right p-3 font-medium">SR</th>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-3 px-4 font-semibold text-gray-900">Batsman</th>
+                      {!isMobile && <th className="text-left py-3 px-4 font-semibold text-gray-900">Dismissal</th>}
+                      <th className="text-right py-3 px-4 font-semibold text-gray-900">R</th>
+                      <th className="text-right py-3 px-4 font-semibold text-gray-900">B</th>
+                      <th className="text-right py-3 px-4 font-semibold text-gray-900">4s</th>
+                      <th className="text-right py-3 px-4 font-semibold text-gray-900">6s</th>
+                      <th className="text-right py-3 px-4 font-semibold text-gray-900">SR</th>
                     </tr>
                   </thead>
                   <tbody>
                     {battingStats.map((player, index) => (
                       <tr 
                         key={player.name} 
-                        className="border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors"
+                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                       >
-                        <td className="p-3">
-                          <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 bg-slate-600/50 rounded-full flex items-center justify-center text-xs font-bold text-slate-300">
-                              {player.position}
-                            </span>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                              <span className="text-xs font-semibold text-gray-600">{player.position}</span>
+                            </div>
                             <div>
-                              <span className="font-medium text-white block">{player.name}</span>
+                              <div className="font-medium text-gray-900">{player.name}</div>
                               {isMobile && (
-                                <span className={`text-xs ${player.dismissal === 'not out' ? 'text-green-400' : 'text-red-400'}`}>
+                                <div className={`text-xs ${player.dismissal === 'not out' ? 'text-green-600' : 'text-red-600'}`}>
                                   {player.dismissal}
-                                </span>
+                                </div>
                               )}
                             </div>
                           </div>
                         </td>
                         {!isMobile && (
-                          <td className="p-3 text-slate-300 max-w-xs">
-                            <span className={`text-xs ${player.dismissal === 'not out' ? 'text-green-400 font-medium' : 'text-red-400'}`}>
+                          <td className="py-3 px-4 text-gray-600 max-w-xs">
+                            <span className={`text-sm ${player.dismissal === 'not out' ? 'text-green-600 font-medium' : 'text-red-600'}`}>
                               {player.dismissal}
                             </span>
                           </td>
                         )}
-                        <td className="p-3 text-right font-bold text-white">{player.runs}</td>
-                        <td className="p-3 text-right text-slate-300">{player.balls}</td>
-                        <td className="p-3 text-right text-green-400 font-medium">{player.fours}</td>
-                        <td className="p-3 text-right text-purple-400 font-medium">{player.sixes}</td>
-                        <td className="p-3 text-right text-blue-400 font-medium">
+                        <td className="py-3 px-4 text-right font-bold text-gray-900">{player.runs}</td>
+                        <td className="py-3 px-4 text-right text-gray-600">{player.balls}</td>
+                        <td className="py-3 px-4 text-right font-semibold text-green-600">{player.fours}</td>
+                        <td className="py-3 px-4 text-right font-semibold text-purple-600">{player.sixes}</td>
+                        <td className="py-3 px-4 text-right font-semibold text-blue-600">
                           {player.strikeRate.toFixed(1)}
                         </td>
                       </tr>
@@ -346,43 +346,43 @@ export const DetailedScorecard: React.FC<DetailedScorecardProps> = ({
               </div>
 
               {/* Extras and Total */}
-              <div className="bg-slate-700/30 rounded-lg p-4">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-sm">
+              <div className="bg-gray-50 rounded-xl p-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                   <div className="text-center">
-                    <div className="text-slate-400 mb-1">Extras</div>
-                    <div className="font-bold text-orange-400">{extras.total}</div>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-gray-600 text-sm font-medium mb-2">Extras</div>
+                    <div className="text-2xl font-bold text-orange-600 mb-1">{extras.total}</div>
+                    <div className="text-xs text-gray-500">
                       (b {extras.byes}, lb {extras.legByes}, w {extras.wides}, nb {extras.noBalls})
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-slate-400 mb-1">Total</div>
-                    <div className="font-bold text-white text-lg">
+                    <div className="text-gray-600 text-sm font-medium mb-2">Total</div>
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
                       {totalRuns}/{totalWickets}
                     </div>
-                    <div className="text-xs text-slate-400">
+                    <div className="text-xs text-gray-500">
                       ({overs}.{balls} ov)
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-slate-400 mb-1">Run Rate</div>
-                    <div className="font-bold text-blue-400">{runRate.toFixed(2)}</div>
+                    <div className="text-gray-600 text-sm font-medium mb-2">Run Rate</div>
+                    <div className="text-2xl font-bold text-blue-600">{runRate.toFixed(2)}</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-slate-400 mb-1">Boundaries</div>
-                    <div className="font-bold text-green-400">
+                    <div className="text-gray-600 text-sm font-medium mb-2">Boundaries</div>
+                    <div className="text-2xl font-bold text-green-600">
                       {battingStats.reduce((sum, p) => sum + p.fours, 0)}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-slate-400 mb-1">Sixes</div>
-                    <div className="font-bold text-purple-400">
+                    <div className="text-gray-600 text-sm font-medium mb-2">Sixes</div>
+                    <div className="text-2xl font-bold text-purple-600">
                       {battingStats.reduce((sum, p) => sum + p.sixes, 0)}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-slate-400 mb-1">Highest</div>
-                    <div className="font-bold text-yellow-400">
+                    <div className="text-gray-600 text-sm font-medium mb-2">Highest</div>
+                    <div className="text-2xl font-bold text-indigo-600">
                       {Math.max(...battingStats.map(p => p.runs))}
                     </div>
                   </div>
@@ -393,37 +393,37 @@ export const DetailedScorecard: React.FC<DetailedScorecardProps> = ({
 
           {activeTab === 'bowling' && (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-700/50 text-slate-300">
-                    <th className="text-left p-3 font-medium">Bowler</th>
-                    <th className="text-right p-3 font-medium">O</th>
-                    <th className="text-right p-3 font-medium">M</th>
-                    <th className="text-right p-3 font-medium">R</th>
-                    <th className="text-right p-3 font-medium">W</th>
-                    <th className="text-right p-3 font-medium">Econ</th>
-                    {!isMobile && <th className="text-right p-3 font-medium">Wd</th>}
-                    {!isMobile && <th className="text-right p-3 font-medium">Nb</th>}
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-3 px-4 font-semibold text-gray-900">Bowler</th>
+                    <th className="text-right py-3 px-4 font-semibold text-gray-900">O</th>
+                    <th className="text-right py-3 px-4 font-semibold text-gray-900">M</th>
+                    <th className="text-right py-3 px-4 font-semibold text-gray-900">R</th>
+                    <th className="text-right py-3 px-4 font-semibold text-gray-900">W</th>
+                    <th className="text-right py-3 px-4 font-semibold text-gray-900">Econ</th>
+                    {!isMobile && <th className="text-right py-3 px-4 font-semibold text-gray-900">Wd</th>}
+                    {!isMobile && <th className="text-right py-3 px-4 font-semibold text-gray-900">Nb</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {bowlingStats.map((bowler, index) => (
                     <tr 
                       key={bowler.name} 
-                      className="border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors"
+                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                     >
-                      <td className="p-3 font-medium text-white">{bowler.name}</td>
-                      <td className="p-3 text-right text-slate-300">{bowler.overs}</td>
-                      <td className="p-3 text-right text-slate-300">{bowler.maidens}</td>
-                      <td className="p-3 text-right text-slate-300">{bowler.runs}</td>
-                      <td className="p-3 text-right font-bold text-red-400">{bowler.wickets}</td>
-                      <td className="p-3 text-right text-blue-400 font-medium">
+                      <td className="py-3 px-4 font-medium text-gray-900">{bowler.name}</td>
+                      <td className="py-3 px-4 text-right text-gray-600">{bowler.overs}</td>
+                      <td className="py-3 px-4 text-right text-gray-600">{bowler.maidens}</td>
+                      <td className="py-3 px-4 text-right text-gray-600">{bowler.runs}</td>
+                      <td className="py-3 px-4 text-right font-bold text-red-600">{bowler.wickets}</td>
+                      <td className="py-3 px-4 text-right font-semibold text-blue-600">
                         {bowler.economy.toFixed(2)}
                       </td>
                       {!isMobile && (
                         <>
-                          <td className="p-3 text-right text-orange-400">{bowler.wides}</td>
-                          <td className="p-3 text-right text-orange-400">{bowler.noballs}</td>
+                          <td className="py-3 px-4 text-right text-orange-600">{bowler.wides}</td>
+                          <td className="py-3 px-4 text-right text-orange-600">{bowler.noballs}</td>
                         </>
                       )}
                     </tr>
@@ -434,33 +434,33 @@ export const DetailedScorecard: React.FC<DetailedScorecardProps> = ({
           )}
 
           {activeTab === 'fow' && (
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-white mb-4">Fall of Wickets</h4>
+            <div className="space-y-6">
+              <h4 className="text-lg font-semibold text-gray-900">Fall of Wickets</h4>
               {fallOfWickets.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {fallOfWickets.map((wicket, index) => (
                     <div 
                       key={index}
-                      className="bg-slate-700/30 rounded-lg p-4 border border-slate-600/30"
+                      className="bg-gray-50 rounded-lg p-4 border border-gray-200"
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-red-400 font-bold">
+                        <span className="text-red-600 font-bold text-lg">
                           {wicket.wicket}/{wicket.runs}
                         </span>
-                        <span className="text-slate-400 text-sm">
+                        <span className="text-gray-500 text-sm">
                           ({wicket.over} ov)
                         </span>
                       </div>
-                      <div className="text-white font-medium mb-1">{wicket.player}</div>
-                      <div className="text-slate-400 text-sm">
+                      <div className="text-gray-900 font-medium mb-1">{wicket.player}</div>
+                      <div className="text-gray-600 text-sm">
                         Partnership: {wicket.partnership} runs
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-slate-400">
-                  <div className="text-4xl mb-2">🏏</div>
+                <div className="text-center py-12 text-gray-500">
+                  <div className="text-4xl mb-4">🏏</div>
                   <p>No wickets fell in this innings</p>
                 </div>
               )}
@@ -472,15 +472,15 @@ export const DetailedScorecard: React.FC<DetailedScorecardProps> = ({
       {/* Innings Selector for multi-innings matches */}
       {match.innings && match.innings.length > 1 && onInningsChange && (
         <div className="flex justify-center">
-          <div className="flex gap-2 bg-slate-800/50 rounded-lg p-2">
+          <div className="inline-flex bg-gray-100 rounded-lg p-1">
             {match.innings.map((inning, index) => (
               <button
                 key={index}
                 onClick={() => onInningsChange(index)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                   selectedInnings === index
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-700'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {inning.team}

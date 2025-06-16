@@ -126,219 +126,330 @@ export const EnhancedMatchAnalyticsScreen: React.FC<EnhancedMatchAnalyticsScreen
   const topBatsmen = viewModel.getTopBatsmen(6);
   const topBowlers = viewModel.getTopBowlers(6);
 
-  // Navigation items for ResponsiveNavigation
+  // Apple-style navigation items
   const navigationItems = [
-    { id: 'overview', label: 'Overview', icon: '📊', onClick: () => setActiveTab('overview') },
-    { id: 'scorecard', label: 'Scorecard', icon: '🏏', onClick: () => setActiveTab('scorecard') },
-    { id: 'players', label: 'Players', icon: '👥', onClick: () => setActiveTab('players') },
-    { id: 'batting', label: 'Batting', icon: '🏏', onClick: () => setActiveTab('batting') },
-    { id: 'bowling', label: 'Bowling', icon: '⚾', onClick: () => setActiveTab('bowling') },
-    { id: 'analysis', label: 'Analytics', icon: '🔍', onClick: () => setActiveTab('analysis') },
-    { id: 'overs', label: 'Over by Over', icon: '📈', onClick: () => setActiveTab('overs') },
-    { id: 'commentary', label: 'Commentary', icon: '🎙️', onClick: () => setActiveTab('commentary') }
+    { id: 'overview', label: 'Overview', icon: '●', onClick: () => setActiveTab('overview') },
+    { id: 'scorecard', label: 'Scorecard', icon: '●', onClick: () => setActiveTab('scorecard') },
+    { id: 'players', label: 'Players', icon: '●', onClick: () => setActiveTab('players') },
+    { id: 'batting', label: 'Batting', icon: '●', onClick: () => setActiveTab('batting') },
+    { id: 'bowling', label: 'Bowling', icon: '●', onClick: () => setActiveTab('bowling') },
+    { id: 'analysis', label: 'Analytics', icon: '●', onClick: () => setActiveTab('analysis') },
+    { id: 'overs', label: 'Over by Over', icon: '●', onClick: () => setActiveTab('overs') },
+    { id: 'commentary', label: 'Commentary', icon: '●', onClick: () => setActiveTab('commentary') }
   ];
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Enhanced Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-emerald-500/5 via-blue-500/5 to-purple-500/5"></div>
-        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-2/3 left-2/3 w-60 h-60 bg-purple-500/10 rounded-full blur-2xl animate-pulse delay-2000"></div>
-      </div>
-
-      {/* Responsive Layout Container */}
-      <div className="relative z-10 min-h-screen flex flex-col">
-        {/* Top Header Bar */}
-        <div className="flex-shrink-0 relative overflow-hidden border-b border-slate-700/50 bg-gradient-to-r from-slate-800/95 via-slate-700/95 to-slate-800/95 backdrop-blur-xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-blue-500/5 to-purple-500/5"></div>
-          <div className={`relative flex items-center justify-between ${getResponsivePadding('p-3', 'md:p-4', 'lg:p-4')}`}>
-            <div className="flex items-center gap-2 md:gap-4">
+    <div className="min-h-screen bg-white">
+      {/* Apple-style Header */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Left side */}
+            <div className="flex items-center space-x-6">
               <button 
                 onClick={() => window.history.back()} 
-                className="group flex items-center gap-2 px-3 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 hover:text-white rounded-lg transition-all duration-300 border border-slate-600/30 hover:border-slate-500/50"
+                className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
               >
-                <span className="text-sm group-hover:scale-110 transition-transform">←</span>
-                <span className={`${getResponsiveText('text-xs', 'md:text-sm')} font-medium hidden sm:inline`}>Back</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="hidden sm:inline text-sm font-medium">Back</span>
               </button>
               
-              <div className="hidden lg:flex items-center gap-3">
-                <div className="flex items-center gap-2 bg-emerald-500/20 px-3 py-1.5 rounded-lg border border-emerald-500/30">
-                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                  <span className="text-emerald-300 text-xs font-medium">Live Analysis</span>
+              {!isMobile && (
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm text-gray-600">Live</span>
+                  </div>
+                  <span className="text-sm text-gray-400">•</span>
+                  <span className="text-sm text-gray-500 font-mono">{matchId}</span>
                 </div>
-                <div className="text-slate-400 text-xs">
-                  Match ID: <span className="font-mono text-slate-300">{matchId}</span>
-                </div>
-              </div>
+              )}
             </div>
             
-            <div className="flex items-center gap-2 text-slate-300">
-              <span className="text-xl">🏏</span>
-              <span className={`${getResponsiveText('text-sm', 'md:text-base')} font-semibold hidden xs:block`}>
-                CricInfo Analytics
-              </span>
+            {/* Center */}
+            <div className="flex-1 flex justify-center">
+              <h1 className="text-lg font-semibold text-gray-900 tracking-tight">
+                Cricket Analytics
+              </h1>
+            </div>
+            
+            {/* Right side */}
+            <div className="w-20"></div>
+          </div>
+        </div>
+      </header>
+
+      {/* Apple-style Match Header */}
+      <section className="bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+          <div className="text-center">
+            <div className="space-y-6">
+              {/* Match Title */}
+              <div>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+                  {matchData.info.teams[0]} vs {matchData.info.teams[1]}
+                </h2>
+                <div className="flex items-center justify-center space-x-4 text-gray-600">
+                  <span className="text-lg">{matchData.info.venue}</span>
+                  <span className="text-gray-400">•</span>
+                  <span className="text-lg">{matchData.info.match_type}</span>
+                </div>
+              </div>
+
+              {/* Match Status */}
+              <div className="inline-flex items-center px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                <span className="text-sm font-medium text-gray-900">Live Match</span>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Match Header */}
-        <div className="bg-gradient-to-r from-slate-800/95 to-slate-700/95 border-slate-700/50 border-b p-4 md:p-6">
-          <MatchHeader match={matchData} showDetails={!isMobile} />
+      {/* Apple-style Navigation */}
+      <nav className="bg-white border-b border-gray-200 sticky top-16 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center">
+            <div className="flex space-x-1 overflow-x-auto scrollbar-hide">
+              {navigationItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={item.onClick}
+                  className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors duration-200 border-b-2 ${
+                    activeTab === item.id
+                      ? 'text-blue-600 border-blue-600'
+                      : 'text-gray-600 border-transparent hover:text-gray-900 hover:border-gray-300'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
+      </nav>
 
-        {/* Navigation */}
-        <div className="flex-shrink-0 border-b border-slate-700/50 bg-slate-800/95">
-          <ResponsiveNavigation items={navigationItems} activeItem={activeTab} />
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-800/50 to-slate-900/50">
-          <div className="w-full max-w-7xl mx-auto p-4 md:p-6">
-            <div className={`space-y-4 ${getResponsiveGap('gap-4', 'md:gap-6', 'lg:gap-8')}`}>
-              
-              {/* Detailed Scorecard Tab */}
-              {activeTab === 'scorecard' && (
-                <DetailedScorecard 
-                  match={matchData} 
-                  selectedInnings={selectedInnings}
-                  onInningsChange={setSelectedInnings}
-                />
-              )}
-
-              {/* Team Comparison */}
-              {activeTab === 'overview' && (
-                <>
-                  {matchSummary.teamStats.length >= 2 && (
-                    <StatsComparison teamStats={matchSummary.teamStats} />
-                  )}
-                  <OverviewTabContent 
-                    matchData={matchData}
-                    matchSummary={matchSummary}
-                    topBatsmen={topBatsmen}
-                    topBowlers={topBowlers}
-                    generateManhattanData={generateManhattanData}
-                  />
-                </>
-              )}
-
-              {activeTab === 'players' && (
-                <PlayersStatsGrid match={matchData} viewModel={viewModel} />
-              )}
-
-              {activeTab === 'batting' && (
-                <BattingTabContent topBatsmen={topBatsmen} />
-              )}
-
-              {activeTab === 'bowling' && (
-                <BowlingTabContent topBowlers={topBowlers} />
-              )}
-
-              {activeTab === 'analysis' && (
-                <div className="space-y-4">
-                  {/* Micro Match Momentum Model */}
-                  <MicroMatchMomentum match={matchData} />
-                  
-                  {/* Ball-by-Ball Momentum Breakdown */}
-                  <BallByBallMomentumBreakdown match={matchData} />
-                  
-                  {/* PowerPlay Analysis */}
-                  <PowerPlayAnalysis match={matchData} />
-                  
-                  {/* Partnership Breakdown */}
-                  <PartnershipBreakdown match={matchData} />
-                  
-                  {/* Bowling Spell Analysis */}
-                  <BowlingSpellAnalysis match={matchData} />
+      {/* Main Content */}
+      <main className="bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="space-y-8">
+            
+            {/* Detailed Scorecard Tab */}
+            {activeTab === 'scorecard' && (
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Match Scorecard</h2>
+                  <p className="text-gray-600">Detailed batting and bowling statistics</p>
                 </div>
-              )}
+                
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                  <DetailedScorecard 
+                    match={matchData} 
+                    selectedInnings={selectedInnings}
+                    onInningsChange={setSelectedInnings}
+                  />
+                </div>
+              </div>
+            )}
 
-              {activeTab === 'overs' && (
-                <>
-                  {/* Compact Innings Selector */}
-                  <div className="mb-3">
-                    <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-1.5">
-                      <span>📈</span>
-                      Select Innings
-                    </h3>
-                    <div className="flex gap-1.5">
-                      {(matchData.innings || []).map((innings, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setSelectedInnings(index)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                            selectedInnings === index
-                              ? 'bg-orange-500 text-white'
-                              : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50 hover:text-white'
-                          }`}
-                        >
-                          {innings.team}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Over by Over Cards */}
-                  {matchData.innings?.[selectedInnings] && (
-                    <div>
-                      <h3 className="text-base font-semibold text-white mb-3 flex items-center gap-1.5">
-                        <span>🏏</span>
-                        {matchData.innings[selectedInnings].team} - Over by Over
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {matchData.innings[selectedInnings].overs.map((over, index) => (
-                          <OverByOverCard 
-                            key={index} 
-                            over={over} 
-                            overNumber={index + 1} 
-                          />
-                        ))}
-                      </div>
+            {/* Overview Tab */}
+            {activeTab === 'overview' && (
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Match Overview</h2>
+                  <p className="text-gray-600">Key statistics and team comparison</p>
+                </div>
+                
+                <div className="space-y-6">
+                  {matchSummary.teamStats.length >= 2 && (
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                      <StatsComparison teamStats={matchSummary.teamStats} />
                     </div>
                   )}
-                </>
-              )}
-
-              {activeTab === 'commentary' && (
-                <>
-                  {/* Compact Innings Selector for Commentary */}
-                  <div className="mb-3">
-                    <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-1.5">
-                      <span>🎙️</span>
-                      Select Innings for Commentary
-                    </h3>
-                    <div className="flex gap-1.5">
-                      {(matchData.innings || []).map((innings, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setSelectedInnings(index)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                            selectedInnings === index
-                              ? 'bg-purple-500 text-white'
-                              : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50 hover:text-white'
-                          }`}
-                        >
-                          {innings.team}
-                        </button>
-                      ))}
-                    </div>
+                  
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                    <OverviewTabContent 
+                      matchData={matchData}
+                      matchSummary={matchSummary}
+                      topBatsmen={topBatsmen}
+                      topBowlers={topBowlers}
+                      generateManhattanData={generateManhattanData}
+                    />
                   </div>
+                </div>
+              </div>
+            )}
 
-                  {/* Live Commentary */}
-                  {matchData.innings?.[selectedInnings] && (
+            {/* Players Tab */}
+            {activeTab === 'players' && (
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Player Statistics</h2>
+                  <p className="text-gray-600">Individual performance analysis</p>
+                </div>
+                
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                  <PlayersStatsGrid match={matchData} viewModel={viewModel} />
+                </div>
+              </div>
+            )}
+
+            {/* Batting Tab */}
+            {activeTab === 'batting' && (
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Batting Analysis</h2>
+                  <p className="text-gray-600">Top batting performances and charts</p>
+                </div>
+                
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                  <BattingTabContent topBatsmen={topBatsmen} />
+                </div>
+              </div>
+            )}
+
+            {/* Bowling Tab */}
+            {activeTab === 'bowling' && (
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Bowling Analysis</h2>
+                  <p className="text-gray-600">Bowling figures and performance metrics</p>
+                </div>
+                
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                  <BowlingTabContent topBowlers={topBowlers} />
+                </div>
+              </div>
+            )}
+
+            {/* Analytics Tab */}
+            {activeTab === 'analysis' && (
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Advanced Analytics</h2>
+                  <p className="text-gray-600">Deep insights and match momentum analysis</p>
+                </div>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                    <MicroMatchMomentum match={matchData} />
+                  </div>
+                  
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                    <BallByBallMomentumBreakdown match={matchData} />
+                  </div>
+                  
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                    <PowerPlayAnalysis match={matchData} />
+                  </div>
+                  
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                    <PartnershipBreakdown match={matchData} />
+                  </div>
+                  
+                  <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                    <BowlingSpellAnalysis match={matchData} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Over by Over Tab */}
+            {activeTab === 'overs' && (
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Over by Over</h2>
+                  <p className="text-gray-600">Detailed breakdown of each over</p>
+                </div>
+                
+                {/* Innings Selector */}
+                <div className="flex justify-center">
+                  <div className="inline-flex bg-gray-100 rounded-lg p-1">
+                    {(matchData.innings || []).map((innings, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedInnings(index)}
+                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                          selectedInnings === index
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        {innings.team}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Over Cards */}
+                {matchData.innings?.[selectedInnings] && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {matchData.innings[selectedInnings].overs.map((over, index) => (
+                      <div key={index} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow duration-200">
+                        <OverByOverCard 
+                          over={over} 
+                          overNumber={index + 1} 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Commentary Tab */}
+            {activeTab === 'commentary' && (
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Live Commentary</h2>
+                  <p className="text-gray-600">Ball-by-ball match commentary</p>
+                </div>
+                
+                {/* Innings Selector */}
+                <div className="flex justify-center">
+                  <div className="inline-flex bg-gray-100 rounded-lg p-1">
+                    {(matchData.innings || []).map((innings, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedInnings(index)}
+                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                          selectedInnings === index
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        {innings.team}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Commentary */}
+                {matchData.innings?.[selectedInnings] && (
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                     <LiveCommentary 
                       innings={matchData.innings[selectedInnings]}
-                      title={`${matchData.innings[selectedInnings].team} Live Commentary`}
+                      title={`${matchData.innings[selectedInnings].team} Commentary`}
                       maxItems={15}
                     />
-                  )}
-                </>
-              )}
-            </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      </main>
+
+      {/* Apple-style Footer */}
+      <footer className="bg-gray-50 border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center text-gray-500">
+            <p className="text-sm">Cricket Analytics • Powered by CricInfo</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }; 
