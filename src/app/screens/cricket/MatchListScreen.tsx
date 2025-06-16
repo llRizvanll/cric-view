@@ -18,8 +18,10 @@ interface MatchesResponse {
   pagination: PaginationInfo;
   availableMatchTypes: string[];
   availableYears: string[];
+  availableCountries: string[];
   currentFilter: string;
   currentYear: string;
+  currentCountry: string;
 }
 
 // Memoized match card component for better performance
@@ -341,19 +343,98 @@ export const MatchListScreen: React.FC = () => {
   const [allMatches, setAllMatches] = useState<CricketMatch[]>([]);
   const [availableMatchTypes, setAvailableMatchTypes] = useState<string[]>([]);
   const [availableYears, setAvailableYears] = useState<string[]>([]);
+  const [availableCountries, setAvailableCountries] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
   const [yearFilter, setYearFilter] = useState<string>('all');
+  const [countryFilter, setCountryFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMoreData, setHasMoreData] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
+  // Add state for expanded filters
+  const [showAllYears, setShowAllYears] = useState(false);
+  const [showAllCountries, setShowAllCountries] = useState(false);
+
+  // Helper function to get country flag emoji
+  const getCountryFlag = (countryName: string): string => {
+    const countryFlags: Record<string, string> = {
+      'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+      'Australia': '🇦🇺',
+      'India': '🇮🇳',
+      'Pakistan': '🇵🇰',
+      'Bangladesh': '🇧🇩',
+      'South Africa': '🇿🇦',
+      'New Zealand': '🇳🇿',
+      'Sri Lanka': '🇱🇰',
+      'West Indies': '🏏',
+      'Afghanistan': '🇦🇫',
+      'Ireland': '🇮🇪',
+      'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+      'Netherlands': '🇳🇱',
+      'Zimbabwe': '🇿🇼',
+      'Kenya': '🇰🇪',
+      'Canada': '🇨🇦',
+      'Bermuda': '🇧🇲',
+      'United Arab Emirates': '🇦🇪',
+      'Nepal': '🇳🇵',
+      'Namibia': '🇳🇦',
+      'Papua New Guinea': '🇵🇬',
+      'Jersey': '🇯🇪',
+      'Guernsey': '🇬🇬',
+      'Italy': '🇮🇹',
+      'Germany': '🇩🇪',
+      'China': '🇨🇳',
+      'Malaysia': '🇲🇾',
+      'Singapore': '🇸🇬',
+      'Hong Kong': '🇭🇰',
+      'Uganda': '🇺🇬',
+      'Tanzania': '🇹🇿',
+      'Botswana': '🇧🇼',
+      'Rwanda': '🇷🇼',
+      'Swaziland': '🇸🇿',
+      'Nigeria': '🇳🇬',
+      'Ghana': '🇬🇭'
+    };
+    return countryFlags[countryName] || '🏏';
+  };
+
+  // Extract unique countries from matches data
+  const extractCountriesFromMatches = useCallback((matches: CricketMatch[]): string[] => {
+    const countriesSet = new Set<string>();
+    
+    // Known county teams and franchise teams to exclude
+    const excludeTeams = new Set([
+      'Birmingham Bears', 'Derbyshire', 'Durham', 'Essex', 'Glamorgan', 'Gloucestershire',
+      'Hampshire', 'Kent', 'Leicestershire', 'Nottinghamshire', 'Somerset', 'Surrey',
+      'Sussex', 'Warwickshire', 'Worcestershire', 'Yorkshire', 'Lancashire', 'Middlesex',
+      'Los Angeles Knight Riders', 'San Francisco Unicorns', 'Seattle Orcas', 'Washington Freedom',
+      'Mumbai Indians', 'Chennai Super Kings', 'Royal Challengers Bangalore', 'Kolkata Knight Riders',
+      'Delhi Capitals', 'Punjab Kings', 'Rajasthan Royals', 'Sunrisers Hyderabad',
+      'Gujarat Titans', 'Lucknow Super Giants', 'Western Australia', 'South Australia',
+      'New South Wales', 'Victoria', 'Queensland', 'Tasmania'
+    ]);
+    
+    matches.forEach(match => {
+      // Only extract teams from international matches
+      if (match.info.team_type === 'international' && match.info.teams && Array.isArray(match.info.teams)) {
+        match.info.teams.forEach(team => {
+          if (team && !excludeTeams.has(team)) {
+            countriesSet.add(team);
+          }
+        });
+      }
+    });
+    
+    return Array.from(countriesSet).sort();
+  }, []);
 
   const loadMatches = useCallback(async (
     page: number = 1, 
     matchTypeFilter: string = 'all', 
-    year: string = 'all', 
+    year: string = 'all',
+    country: string = 'all',
     append: boolean = false
   ) => {
     try {
@@ -377,15 +458,28 @@ export const MatchListScreen: React.FC = () => {
         params.append('year', year);
       }
       
+      if (country !== 'all') {
+        params.append('country', country);
+      }
+      
+      // Note: Cache will rebuild automatically if expired or missing
+      
       const url = `/api/matches?${params.toString()}`;
       console.log(`Fetching matches from ${url}`);
+      
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
       const response = await fetch(url, {
         // Add cache headers for better performance
         headers: {
           'Cache-Control': 'no-cache',
         },
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -406,30 +500,48 @@ export const MatchListScreen: React.FC = () => {
       
       setAvailableMatchTypes(data.availableMatchTypes);
       setAvailableYears(data.availableYears);
+      
+      // Set available countries from API response or extract from matches
+      if (data.availableCountries) {
+        setAvailableCountries(data.availableCountries);
+      } else {
+        // Fallback: extract countries from current matches
+        const countries = extractCountriesFromMatches(data.matches);
+        setAvailableCountries(countries);
+      }
+      
       setCurrentPage(page);
       setFilter(matchTypeFilter);
       setYearFilter(year);
+      setCountryFilter(country);
       setHasMoreData(data.pagination.hasNext);
       setTotalCount(data.pagination.total);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load matches';
+      let errorMessage = 'Failed to load matches';
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          errorMessage = 'Request timed out. The server may be building the index. Please try again in a moment.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
       setError(errorMessage);
       console.error('Error loading matches:', err);
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, []);
+  }, [extractCountriesFromMatches]);
 
   useEffect(() => {
-    loadMatches(1, 'all', 'all', false);
+    loadMatches(1, 'all', 'all', 'all', false);
   }, [loadMatches]);
 
   const handleLoadMore = useCallback(() => {
     if (hasMoreData && !loadingMore) {
-      loadMatches(currentPage + 1, filter, yearFilter, true);
+      loadMatches(currentPage + 1, filter, yearFilter, countryFilter, true);
     }
-  }, [hasMoreData, loadingMore, currentPage, filter, yearFilter, loadMatches]);
+  }, [hasMoreData, loadingMore, currentPage, filter, yearFilter, countryFilter, loadMatches]);
 
   const handleFilterChange = useCallback((newFilter: string) => {
     if (newFilter !== filter) {
@@ -437,9 +549,9 @@ export const MatchListScreen: React.FC = () => {
       setAllMatches([]);
       setCurrentPage(1);
       setHasMoreData(true);
-      loadMatches(1, newFilter, yearFilter, false);
+      loadMatches(1, newFilter, yearFilter, countryFilter, false);
     }
-  }, [filter, yearFilter, loadMatches]);
+  }, [filter, yearFilter, countryFilter, loadMatches]);
 
   const handleYearChange = useCallback((newYear: string) => {
     if (newYear !== yearFilter) {
@@ -447,9 +559,19 @@ export const MatchListScreen: React.FC = () => {
       setAllMatches([]);
       setCurrentPage(1);
       setHasMoreData(true);
-      loadMatches(1, filter, newYear, false);
+      loadMatches(1, filter, newYear, countryFilter, false);
     }
-  }, [filter, yearFilter, loadMatches]);
+  }, [filter, yearFilter, countryFilter, loadMatches]);
+
+  const handleCountryChange = useCallback((newCountry: string) => {
+    if (newCountry !== countryFilter) {
+      // Reset all matches and start from page 1
+      setAllMatches([]);
+      setCurrentPage(1);
+      setHasMoreData(true);
+      loadMatches(1, filter, yearFilter, newCountry, false);
+    }
+  }, [filter, yearFilter, countryFilter, loadMatches]);
 
   // Memoized filter buttons to prevent unnecessary re-renders
   const filterButtons = useMemo(() => (
@@ -486,44 +608,116 @@ export const MatchListScreen: React.FC = () => {
     </div>
   ), [filter, totalCount, availableMatchTypes, handleFilterChange]);
 
-  const yearButtons = useMemo(() => (
-    <div className="bg-gray-50 rounded-xl p-2 mb-4">
-      <div className="flex items-center gap-1.5 mb-1.5">
-        <span className="text-xs">📅</span>
-        <span className="text-xs font-semibold text-gray-700">Year</span>
-      </div>
-      <div className="flex gap-1.5 flex-wrap">
-        <button
-          onClick={() => handleYearChange('all')}
-          className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
-            yearFilter === 'all'
-              ? 'bg-green-500 text-white shadow-sm'
-              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-          }`}
-        >
-          All Years
-        </button>
-        {availableYears.slice(0, 8).map(year => (
+  const yearButtons = useMemo(() => {
+    const yearsToShow = showAllYears ? availableYears : availableYears.slice(0, 8);
+    const remainingYears = availableYears.length - 8;
+    
+    return (
+      <div className="bg-gray-50 rounded-xl p-2 mb-4">
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <span className="text-xs">📅</span>
+          <span className="text-xs font-semibold text-gray-700">Year</span>
+        </div>
+        <div className="flex gap-1.5 flex-wrap">
           <button
-            key={year}
-            onClick={() => handleYearChange(year)}
+            onClick={() => handleYearChange('all')}
             className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
-              yearFilter === year
+              yearFilter === 'all'
                 ? 'bg-green-500 text-white shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
-            {year}
+            All Years
           </button>
-        ))}
-        {availableYears.length > 8 && (
-          <span className="px-2.5 py-1 text-xs text-gray-500 bg-gray-100 rounded-md">
-            +{availableYears.length - 8} more
-          </span>
-        )}
+          {yearsToShow.map(year => (
+            <button
+              key={year}
+              onClick={() => handleYearChange(year)}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+                yearFilter === year
+                  ? 'bg-green-500 text-white shadow-sm'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              {year}
+            </button>
+          ))}
+          {availableYears.length > 8 && !showAllYears && (
+            <button
+              onClick={() => setShowAllYears(true)}
+              className="px-2.5 py-1 text-xs text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-200 cursor-pointer"
+            >
+              +{remainingYears} more
+            </button>
+          )}
+          {showAllYears && availableYears.length > 8 && (
+            <button
+              onClick={() => setShowAllYears(false)}
+              className="px-2.5 py-1 text-xs text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-200 cursor-pointer"
+            >
+              Show less
+            </button>
+          )}
+        </div>
       </div>
-    </div>
-  ), [yearFilter, availableYears, handleYearChange]);
+    );
+  }, [yearFilter, availableYears, handleYearChange, showAllYears]);
+
+  const countryButtons = useMemo(() => {
+    const countriesToShow = showAllCountries ? availableCountries : availableCountries.slice(0, 10);
+    const remainingCountries = availableCountries.length - 10;
+    
+    return (
+      <div className="bg-gray-50 rounded-xl p-2 mb-4">
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <span className="text-xs">🌍</span>
+          <span className="text-xs font-semibold text-gray-700">Country</span>
+        </div>
+        <div className="flex gap-1.5 flex-wrap">
+          <button
+            onClick={() => handleCountryChange('all')}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+              countryFilter === 'all'
+                ? 'bg-purple-500 text-white shadow-sm'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            All Countries
+          </button>
+          {countriesToShow.map(country => (
+            <button
+              key={country}
+              onClick={() => handleCountryChange(country)}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+                countryFilter === country
+                  ? 'bg-purple-500 text-white shadow-sm'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              <span className="mr-1">{getCountryFlag(country)}</span>
+              {country}
+            </button>
+          ))}
+          {availableCountries.length > 10 && !showAllCountries && (
+            <button
+              onClick={() => setShowAllCountries(true)}
+              className="px-2.5 py-1 text-xs text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-200 cursor-pointer"
+            >
+              +{remainingCountries} more
+            </button>
+          )}
+          {showAllCountries && availableCountries.length > 10 && (
+            <button
+              onClick={() => setShowAllCountries(false)}
+              className="px-2.5 py-1 text-xs text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-200 cursor-pointer"
+            >
+              Show less
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }, [countryFilter, availableCountries, handleCountryChange, showAllCountries, getCountryFlag]);
 
   // Memoized match grid to prevent unnecessary re-renders
   const matchGrid = useMemo(() => (
@@ -598,12 +792,34 @@ export const MatchListScreen: React.FC = () => {
           <div className="text-4xl mb-4">⚠️</div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Error Loading Matches</h2>
           <p className="text-gray-600 text-sm mb-6">{error}</p>
-          <button
-            onClick={() => loadMatches(1, filter, yearFilter, false)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200"
-          >
-            Try Again
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={() => loadMatches(1, filter, yearFilter, countryFilter, false)}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200"
+            >
+              Try Again
+            </button>
+            {error.includes('timed out') && (
+              <button
+                onClick={async () => {
+                  setError(null);
+                  setLoading(true);
+                  try {
+                    const response = await fetch('/api/matches?rebuild_cache=true&page=1&limit=20');
+                    if (response.ok) {
+                      window.location.reload();
+                    }
+                  } catch (e) {
+                    setError('Failed to rebuild cache');
+                  }
+                  setLoading(false);
+                }}
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200"
+              >
+                🔄 Rebuild Index
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -665,9 +881,10 @@ export const MatchListScreen: React.FC = () => {
         {/* Filter Sections */}
         {filterButtons}
         {yearButtons}
+        {countryButtons}
 
         {/* Current Filter Status */}
-        {(filter !== 'all' || yearFilter !== 'all') && (
+        {(filter !== 'all' || yearFilter !== 'all' || countryFilter !== 'all') && (
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-2.5 mb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs text-blue-800">
@@ -675,16 +892,18 @@ export const MatchListScreen: React.FC = () => {
                 <span>
                   Showing <strong>{filter}</strong> matches
                   {yearFilter !== 'all' && <> from <strong>{yearFilter}</strong></>}
+                  {countryFilter !== 'all' && <> in <strong>{countryFilter}</strong></>}
                 </span>
               </div>
               <button
                 onClick={() => {
                   setFilter('all');
                   setYearFilter('all');
+                  setCountryFilter('all');
                   setAllMatches([]);
                   setCurrentPage(1);
                   setHasMoreData(true);
-                  loadMatches(1, 'all', 'all', false);
+                  loadMatches(1, 'all', 'all', 'all', false);
                 }}
                 className="text-blue-600 hover:text-blue-800 text-xs font-medium"
               >

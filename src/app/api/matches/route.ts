@@ -24,6 +24,7 @@ interface CacheData {
   metadata: MatchMetadata[];
   matchTypes: string[];
   years: string[];
+  countries: string[];
   totalCount: number;
   lastUpdated: number;
 }
@@ -58,6 +59,7 @@ async function buildMetadataIndex(): Promise<CacheData> {
   const metadata: MatchMetadata[] = [];
   const matchTypes = new Set<string>();
   const years = new Set<string>();
+  const countries = new Set<string>();
   
   // Process files in batches for better memory management
   const BATCH_SIZE = 50;
@@ -109,6 +111,27 @@ async function buildMetadataIndex(): Promise<CacheData> {
           matchTypes.add(matchType);
           if (year) years.add(year);
           
+          // Add countries from teams (only from international matches)
+          if (info.team_type === 'international' && info.teams && Array.isArray(info.teams)) {
+            // Known county teams and franchise teams to exclude
+            const excludeTeams = new Set([
+              'Birmingham Bears', 'Derbyshire', 'Durham', 'Essex', 'Glamorgan', 'Gloucestershire',
+              'Hampshire', 'Kent', 'Leicestershire', 'Nottinghamshire', 'Somerset', 'Surrey',
+              'Sussex', 'Warwickshire', 'Worcestershire', 'Yorkshire', 'Lancashire', 'Middlesex',
+              'Los Angeles Knight Riders', 'San Francisco Unicorns', 'Seattle Orcas', 'Washington Freedom',
+              'Mumbai Indians', 'Chennai Super Kings', 'Royal Challengers Bangalore', 'Kolkata Knight Riders',
+              'Delhi Capitals', 'Punjab Kings', 'Rajasthan Royals', 'Sunrisers Hyderabad',
+              'Gujarat Titans', 'Lucknow Super Giants', 'Western Australia', 'South Australia',
+              'New South Wales', 'Victoria', 'Queensland', 'Tasmania'
+            ]);
+            
+            info.teams.forEach((team: string) => {
+              if (team && !excludeTeams.has(team)) {
+                countries.add(team);
+              }
+            });
+          }
+          
           metadata.push({
             matchId: file.replace('.json', ''),
             filename: file,
@@ -147,6 +170,7 @@ async function buildMetadataIndex(): Promise<CacheData> {
     metadata,
     matchTypes: Array.from(matchTypes).sort(),
     years: Array.from(years).sort((a, b) => parseInt(b) - parseInt(a)),
+    countries: Array.from(countries).sort(),
     totalCount: metadata.length,
     lastUpdated: Date.now()
   };
@@ -166,29 +190,33 @@ async function buildMetadataIndex(): Promise<CacheData> {
 }
 
 // Load metadata index from disk or build new one
-async function getMetadataIndex(): Promise<CacheData> {
+async function getMetadataIndex(forceRebuild: boolean = false): Promise<CacheData> {
   const now = Date.now();
   
-  // Return cached data if available and not expired
-  if (globalCache && (now - cacheTimestamp) < CACHE_DURATION) {
+  // Return cached data if available and not expired (unless force rebuild)
+  if (!forceRebuild && globalCache && (now - cacheTimestamp) < CACHE_DURATION) {
     console.log('Using cached metadata index');
     return globalCache;
   }
 
   try {
-    // Try to load from disk first
-    const indexContent = await fs.readFile(INDEX_FILE_PATH, 'utf-8');
-    const diskCache: CacheData = JSON.parse(indexContent);
-    
-    // Check if disk cache is recent enough (24 hours)
-    const DISK_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-    if ((now - diskCache.lastUpdated) < DISK_CACHE_DURATION) {
-      console.log(`Loaded metadata index from disk (${diskCache.metadata.length} matches)`);
-      globalCache = diskCache;
-      cacheTimestamp = now;
-      return diskCache;
+    // Try to load from disk first (unless force rebuild)
+    if (!forceRebuild) {
+      const indexContent = await fs.readFile(INDEX_FILE_PATH, 'utf-8');
+      const diskCache: CacheData = JSON.parse(indexContent);
+      
+      // Check if disk cache is recent enough (24 hours) and has countries field
+      const DISK_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+      if ((now - diskCache.lastUpdated) < DISK_CACHE_DURATION && diskCache.countries) {
+        console.log(`Loaded metadata index from disk (${diskCache.metadata.length} matches, ${diskCache.countries.length} countries)`);
+        globalCache = diskCache;
+        cacheTimestamp = now;
+        return diskCache;
+      } else {
+        console.log('Disk cache expired or missing countries, rebuilding index...');
+      }
     } else {
-      console.log('Disk cache expired, rebuilding index...');
+      console.log('Force rebuilding cache...');
     }
   } catch (error) {
     console.log('No disk cache found or error reading it, building new index...');
@@ -246,12 +274,14 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const matchTypeFilter = searchParams.get('match_type');
     const yearFilter = searchParams.get('year');
+    const countryFilter = searchParams.get('country');
+    const rebuildCache = searchParams.get('rebuild_cache') === 'true';
     const offset = (page - 1) * limit;
 
-    console.log(`API Request: page=${page}, limit=${limit}, filter=${matchTypeFilter}, year=${yearFilter}`);
+    console.log(`API Request: page=${page}, limit=${limit}, filter=${matchTypeFilter}, year=${yearFilter}, country=${countryFilter}, rebuild=${rebuildCache}`);
 
     // Get metadata index (very fast now)
-    const cacheData = await getMetadataIndex();
+    const cacheData = await getMetadataIndex(rebuildCache);
     
     if (cacheData.metadata.length === 0) {
       return NextResponse.json({
@@ -266,8 +296,10 @@ export async function GET(request: NextRequest) {
         },
         availableMatchTypes: [],
         availableYears: [],
+        availableCountries: [],
         currentFilter: 'all',
-        currentYear: 'all'
+        currentYear: 'all',
+        currentCountry: 'all'
       });
     }
 
@@ -283,6 +315,12 @@ export async function GET(request: NextRequest) {
     if (yearFilter && yearFilter !== 'all') {
       filteredMetadata = filteredMetadata.filter(meta => meta.year === yearFilter);
     }
+    
+    if (countryFilter && countryFilter !== 'all') {
+      filteredMetadata = filteredMetadata.filter(meta => 
+        meta.teams.some(team => team.toLowerCase() === countryFilter.toLowerCase())
+      );
+    }
 
     // Apply pagination to filtered metadata
     const total = filteredMetadata.length;
@@ -294,7 +332,7 @@ export async function GET(request: NextRequest) {
     const matches = await Promise.all(matchPromises);
     const validMatches = matches.filter(match => match !== null) as CricketMatch[];
 
-    console.log(`Loaded ${validMatches.length} matches for page ${page} in optimized mode (filter: ${matchTypeFilter || 'all'}, year: ${yearFilter || 'all'})`);
+    console.log(`Loaded ${validMatches.length} matches for page ${page} in optimized mode (filter: ${matchTypeFilter || 'all'}, year: ${yearFilter || 'all'}, country: ${countryFilter || 'all'})`);
 
     return NextResponse.json({
       matches: validMatches,
@@ -308,8 +346,10 @@ export async function GET(request: NextRequest) {
       },
       availableMatchTypes: cacheData.matchTypes,
       availableYears: cacheData.years,
+      availableCountries: cacheData.countries,
       currentFilter: matchTypeFilter || 'all',
-      currentYear: yearFilter || 'all'
+      currentYear: yearFilter || 'all',
+      currentCountry: countryFilter || 'all'
     });
     
   } catch (error) {
