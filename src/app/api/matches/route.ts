@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 import { CricketMatch } from '../../models/CricketMatchModel';
@@ -239,9 +239,9 @@ async function loadMatchFromFile(filename: string): Promise<CricketMatch | null>
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const matchTypeFilter = searchParams.get('match_type');
