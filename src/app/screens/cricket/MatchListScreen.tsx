@@ -21,17 +21,23 @@ interface MatchesResponse {
 }
 
 export const MatchListScreen: React.FC = () => {
-  const [matches, setMatches] = useState<CricketMatch[]>([]);
-  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+  const [allMatches, setAllMatches] = useState<CricketMatch[]>([]);
   const [availableMatchTypes, setAvailableMatchTypes] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
 
-  const loadMatches = async (page: number = 1, matchTypeFilter: string = 'all') => {
+  const loadMatches = async (page: number = 1, matchTypeFilter: string = 'all', append: boolean = false) => {
     try {
-      setLoading(true);
+      if (page === 1) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
       setError(null);
       
       const params = new URLSearchParams({
@@ -62,65 +68,104 @@ export const MatchListScreen: React.FC = () => {
       console.log('Pagination info:', data.pagination);
       console.log('Available match types:', data.availableMatchTypes);
       
-      setMatches(data.matches);
-      setPagination(data.pagination);
+      if (append) {
+        // Append new matches to existing ones
+        setAllMatches(prev => [...prev, ...data.matches]);
+      } else {
+        // Replace all matches (new filter)
+        setAllMatches(data.matches);
+      }
+      
       setAvailableMatchTypes(data.availableMatchTypes);
       setCurrentPage(page);
       setFilter(matchTypeFilter);
+      setHasMoreData(data.pagination.hasNext);
+      setTotalCount(data.pagination.total);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load matches';
       setError(errorMessage);
       console.error('Error loading matches:', err);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
   useEffect(() => {
-    loadMatches(1, 'all');
+    loadMatches(1, 'all', false);
   }, []);
 
-  const handlePageChange = (newPage: number) => {
-    if (newPage !== currentPage && pagination) {
-      if (newPage >= 1 && newPage <= pagination.totalPages) {
-        loadMatches(newPage, filter);
-      }
+  const handleLoadMore = () => {
+    if (hasMoreData && !loadingMore) {
+      loadMatches(currentPage + 1, filter, true);
     }
   };
 
   const handleFilterChange = (newFilter: string) => {
     if (newFilter !== filter) {
-      // Reset to page 1 when changing filters
-      loadMatches(1, newFilter);
+      // Reset all matches and start from page 1
+      setAllMatches([]);
+      setCurrentPage(1);
+      setHasMoreData(true);
+      loadMatches(1, newFilter, false);
     }
   };
 
-  // Remove client-side filtering since we're doing it server-side now
-  const filteredMatches = matches;
-
   console.log('Debug info:', {
-    totalMatches: matches.length,
-    filteredMatches: filteredMatches.length,
+    totalMatches: allMatches.length,
     filter,
     availableMatchTypes,
     currentPage,
-    pagination
+    hasMoreData,
+    totalCount,
+    loadingMore
   });
 
-  if (loading) {
+  if (loading && allMatches.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="text-xl mb-4">Loading matches...</div>
-          <div className="text-sm text-gray-600">
-            Fetching data from API (Page {currentPage}, Filter: {filter})
-          </div>
+      <div className="container mx-auto p-4">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Cricket Matches</h1>
+          <div className="text-sm text-gray-600">Loading...</div>
+        </div>
+
+        {/* Loading skeleton for filter buttons */}
+        <div className="flex gap-2 mb-6 flex-wrap">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="animate-pulse bg-gray-200 h-10 w-20 rounded-lg"></div>
+          ))}
+        </div>
+
+        {/* Loading skeleton for match cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="bg-white rounded-lg shadow animate-pulse">
+              <div className="p-4 border-b border-gray-100">
+                <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                <div className="flex gap-4">
+                  <div className="h-4 bg-gray-200 rounded w-16"></div>
+                  <div className="h-4 bg-gray-200 rounded w-24"></div>
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-b-lg">
+                <div className="h-4 bg-gray-200 rounded mb-1"></div>
+                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error && allMatches.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-md">
@@ -128,7 +173,7 @@ export const MatchListScreen: React.FC = () => {
           <div className="text-sm text-gray-600 mb-4">{error}</div>
           <div className="space-y-2">
             <button 
-              onClick={() => loadMatches(currentPage, filter)} 
+              onClick={() => loadMatches(1, filter, false)} 
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mr-2"
             >
               Retry
@@ -142,7 +187,7 @@ export const MatchListScreen: React.FC = () => {
     );
   }
 
-  if (matches.length === 0 && pagination?.total === 0) {
+  if (allMatches.length === 0 && totalCount === 0) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -171,14 +216,8 @@ export const MatchListScreen: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Cricket Matches</h1>
         <div className="text-sm text-gray-600">
-          {pagination && (
-            <>
-              Showing {matches.length} of {pagination.total} matches
-              {filter !== 'all' && ` (${filter})`}
-              <br />
-              Page {pagination.page} of {pagination.totalPages}
-            </>
-          )}
+          Showing {allMatches.length} of {totalCount} matches
+          {filter !== 'all' && ` (${filter})`}
         </div>
       </div>
 
@@ -212,7 +251,7 @@ export const MatchListScreen: React.FC = () => {
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMatches.map((match, index) => {
+        {allMatches.map((match, index) => {
           const matchDate = new Date(match.info.dates[0]);
           const isRecent = (Date.now() - matchDate.getTime()) < (7 * 24 * 60 * 60 * 1000);
           
@@ -323,74 +362,59 @@ export const MatchListScreen: React.FC = () => {
         })}
       </div>
 
-      {/* Pagination Controls */}
-      {pagination && pagination.totalPages > 1 && (
-        <div className="flex justify-center items-center mt-8 space-x-2">
+      {/* Load More Button */}
+      {hasMoreData && (
+        <div className="flex justify-center mt-8">
           <button
-            onClick={() => handlePageChange(1)}
-            disabled={!pagination.hasPrev}
-            className={`px-3 py-2 text-sm rounded ${
-              !pagination.hasPrev
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+              loadingMore
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg transform hover:scale-105'
             }`}
           >
-            First
-          </button>
-          
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={!pagination.hasPrev}
-            className={`px-3 py-2 text-sm rounded ${
-              !pagination.hasPrev
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            Previous
-          </button>
-
-          <span className="px-4 py-2 text-sm text-gray-700">
-            Page {pagination.page} of {pagination.totalPages}
-          </span>
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={!pagination.hasNext}
-            className={`px-3 py-2 text-sm rounded ${
-              !pagination.hasNext
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            Next
-          </button>
-
-          <button
-            onClick={() => handlePageChange(pagination.totalPages)}
-            disabled={!pagination.hasNext}
-            className={`px-3 py-2 text-sm rounded ${
-              !pagination.hasNext
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            Last
+            {loadingMore ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Loading more matches...
+              </div>
+            ) : (
+              `Load More Matches (${totalCount - allMatches.length} remaining)`
+            )}
           </button>
         </div>
       )}
 
-      {filteredMatches.length === 0 && matches.length === 0 && pagination && pagination.total > 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-500 text-lg">No matches found on this page.</div>
+      {/* End of results message */}
+      {!hasMoreData && allMatches.length > 0 && (
+        <div className="text-center mt-8 py-4">
+          <div className="text-gray-500">
+            🏏 You&apos;ve reached the end! All {totalCount} matches loaded.
+          </div>
+          {filter !== 'all' && (
+            <button 
+              onClick={() => handleFilterChange('all')}
+              className="mt-2 text-blue-600 hover:text-blue-800 underline"
+            >
+              View all match types
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Error message for load more */}
+      {error && allMatches.length > 0 && (
+        <div className="text-center mt-8 py-4">
+          <div className="text-red-600 mb-2">Failed to load more matches</div>
           <button 
-            onClick={() => handlePageChange(1)}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={handleLoadMore}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
           >
-            Go to First Page
+            Retry
           </button>
         </div>
       )}
     </div>
   );
-}; 
+};
