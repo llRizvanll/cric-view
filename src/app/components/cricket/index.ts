@@ -12,4 +12,19 @@ export { StatsComparison } from './StatsComparison';
 export { ManhattanChart } from './ManhattanChart';
 export { OverByOverCard } from './OverByOverCard';
 export { WagonWheel } from './WagonWheel';
-export { MatchPrediction } from './MatchPrediction'; 
+export { MatchPrediction } from './MatchPrediction';
+export { PlayersStatsGrid } from './PlayersStatsGrid';
+
+// Modular UI components
+export { LoadingState } from './LoadingState';
+export { ErrorState } from './ErrorState';
+export { NavigationHeader } from './NavigationHeader';
+export { TabNavigation, type TabType } from './TabNavigation';
+export { QuickStatsCards } from './QuickStatsCards';
+export { PerformanceHighlights } from './PerformanceHighlights';
+export { InningsSelector } from './InningsSelector';
+
+// Tab content components
+export { OverviewTabContent } from './OverviewTabContent';
+export { BattingTabContent } from './BattingTabContent';
+export { BowlingTabContent } from './BowlingTabContent'; 
